@@ -31,4 +31,13 @@ public class ViewController {
 
     return "main";
   }
+
+  @GetMapping("/services/{id}")
+  public String getServiceById(
+      @PathVariable Long id, @RequestParam(required = false) String query, Model model) {
+    model.addAttribute("service", serviceRepository.findById(id));
+    model.addAttribute("query", query);
+
+    return "details";
+  }
 }

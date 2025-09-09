@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${service.title}">РИП | Услуга</title>
+  <link rel="stylesheet" th:href="@{/assets/css/main.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/header.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/detailed.css}">
+</head>
+<body>
+<div class="detailed-page-container">
+  <header th:insert="~{fragments/header :: header}"></header>
+
+  <div class="content-container">
+    <div class="inner-content-container">
+
+      <div class="inner-text-container">
+        <div class="inner-text-header-container">
+
+          <div class="inner-title-container">
+            <h1 class="detailed-service-title-text"
+                th:text="${service.title}">
+              Название Услуги
+            </h1>
+          </div>
+
+          <div class="inner-info-container">
+            <div class="inner-index-container">
+              <h3 class="inner-secondary-text"
+                  th:text="'Изменение индекса с прошлого месяца: ' + ${service.index} + '%'">
+                Изменение индекса с прошлого месяца:
+              </h3>
+            </div>
+
+            <div class="inner-price-container">
+              <h3 class="inner-secondary-text"
+                  th:text="'Базовая стоимость: ' + ${service.basePrice} + ' руб'">
+                Базовая стоимость:
+              </h3>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="inner-description-container">
+          <p class="inner-description-text"
+             th:text="${service.description}">
+            Текст описания услуги
+          </p>
+        </div>
+      </div>
+
+      <div class="inner-image-container"
+           th:style="|background-image: url('http://127.0.0.1:9000/images/${service.imageId}.jpg')|">
+
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
