@@ -1,0 +1,71 @@
+/* 🎨 Глобальные переменные */
+:root {
+  --font-family-base: "Noto Sans", sans-serif;
+  --font-style-base: normal;
+  --line-height-base: normal;
+
+  --color-text-primary: #101D40;
+  --color-text-secondary: #FFF;
+  --color-border: #DEE3E9;
+  --color-accent: #156DF9;
+
+  --radius-sm: 4px;
+  --spacing-lg: 80px;
+  --spacing-md: 48px;
+  --spacing-sm: 36px;
+}
+
+/* 📌 Индекс CPI */
+.cpi-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  padding: var(--spacing-md) var(--spacing-lg) 32px var(--spacing-lg);
+}
+
+.cpi-text {
+  font-family: var(--font-family-base);
+  font-style: var(--font-style-base);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+}
+
+/* 🛒 Корзина */
+.order-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  flex: 1 0 0;
+  gap: var(--spacing-sm);
+  padding-inline: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* 🔘 Кнопка */
+.order-button-container {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+
+  background: #156DF9;
+  color: #FFF;
+
+  font-family: var(--font-family-base);
+  font-style: var(--font-style-base);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: var(--line-height-base);
+
+  transition: background 0.2s ease-in-out;
+}
+
+.order-button-container:hover {
+  cursor: pointer;
+}
