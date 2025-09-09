@@ -7,7 +7,7 @@
   align-self: stretch;
   width: 100%;
 
-  background: #fff; /* чтобы под контентом не просвечивало */
+  background: #fff;
   border-bottom: 1px solid var(--color-border);
 }
 
