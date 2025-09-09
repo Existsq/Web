@@ -1,0 +1,173 @@
+/* Контейнер заказа */
+.ordered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  align-self: stretch;
+}
+
+/* Номер элемента */
+.number-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.number-text {
+  color: #101D40;
+  font-family: "Noto Sans";
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+/* Горизонтальная карточка */
+.horizontal-card-container {
+  display: flex;
+  width: 1002px;
+  height: 253px;
+  padding-right: 38px;
+  align-items: center;
+  gap: 36px;
+  border-radius: 4px;
+  border: 1px solid #DEE3E9;
+  background: #FFF;
+}
+
+.horizontal-card-image-container {
+  display: flex;
+  width: 277.75px;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  align-self: stretch;
+  border-radius: 3px 0 0 3px;
+  background: lightgray 50% / cover no-repeat;
+}
+
+.horizontal-card-content-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+/* Заголовок карточки */
+.horizontal-card-title-container {
+  display: flex;
+  width: 175px;
+  max-width: 175px;
+  padding-top: 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.horizontal-card-title-container:hover {
+  cursor: pointer;
+}
+
+.horizontal-card-title-text {
+  flex: 1 0 0;
+  color: #101D40;
+  font-family: "Noto Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+/* Описание карточки */
+.horizontal-card-description-container {
+  display: flex;
+  width: 200px;
+  max-width: 200px;
+  padding-top: 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.horizontal-card-description-text {
+  color: #586179;
+  font-family: "Noto Sans";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex: 1 0 0;
+}
+
+/* Индекс (например, % показатель) */
+.horizontal-card-index-container {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  padding: 16px;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1/1;
+  border-radius: 4px;
+  border: 1px solid #E8EDF1;
+  background: #156DF9;
+}
+
+.horizontal-card-index-text {
+  color: #FFF;
+  font-family: "Noto Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+
+/* Блок с кнопкой / ценой */
+.horizontal-card-input-container {
+  display: flex;
+  width: 107px;
+  height: 44px;
+  padding: 13px;
+  justify-content: center;
+  align-items: center;
+  color: #586179;
+  font-family: "Noto Sans";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  outline: none;
+  border-radius: 4px;
+  border: 1px solid #DEE3E9;
+}
+
+/* Иконка удаления */
+.delete-icon-container {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  aspect-ratio: 1/1;
+  outline: none;
+  border: none;
+  background-color: #fff;
+}
+
+.delete-icon-container:hover {
+  cursor: pointer;
+}
+
+.delete-icon {
+  width: 15px;
+  height: 19px;
+  flex-shrink: 0;
+  aspect-ratio: 15/19;
+  fill: #586179;
+}

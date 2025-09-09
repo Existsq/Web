@@ -40,4 +40,13 @@ public class ViewController {
 
     return "details";
   }
+
+  @GetMapping("/cart/{id}")
+  public String getCart(
+      @PathVariable Long id, @RequestParam(required = false) String query, Model model) {
+    model.addAttribute("services", serviceRepository.findServicesByCart(id));
+    model.addAttribute("query", query);
+
+    return "order";
+  }
 }
