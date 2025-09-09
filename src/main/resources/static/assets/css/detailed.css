@@ -1,0 +1,114 @@
+.detailed-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background: var(--color-bg);
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.inner-content-container {
+  display: flex;
+  padding: 0 32px 0 80px;
+  align-items: flex-start;
+  gap: 52px;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.inner-text-container {
+  display: flex;
+  height: 750px;
+  padding-top: 48px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 52px;
+  flex: 1 0 0;
+}
+
+.inner-text-header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 52px;
+  align-self: stretch;
+}
+
+.inner-title-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.detailed-card-title-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.inner-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.inner-index-container {
+  display: flex;
+  width: 676px;
+  align-items: center;
+}
+
+.inner-price-container {
+  display: flex;
+  width: 676px;
+  align-items: center;
+}
+
+.inner-secondary-text {
+  color: #101D40;
+  font-family: "Noto Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.inner-image-container {
+  display: flex;
+  width: 600px;
+  height: 520px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: lightgray 50% / cover no-repeat;
+}
+
+.inner-description-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.inner-description-text {
+  color: #586179;
+  font-family: "Noto Sans";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+
+}
