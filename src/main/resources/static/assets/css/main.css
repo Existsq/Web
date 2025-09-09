@@ -116,6 +116,7 @@ header {
 }
 
 .cart-icon-wrapper {
+  position: relative;
   display: flex;
   width: 52px;
   height: 52px;
@@ -135,6 +136,23 @@ header {
   fill: #586179;
   flex: 1 0 0;
   align-self: stretch;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;      /* смещение вверх, чтобы кружочек был наполовину сверху */
+  right: -5px;    /* смещение вправо */
+  background: #156DF9;
+  color: white;
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  border: 1px solid white; /* опционально, чтобы отделять от иконки */
 }
 
 .search-submit-button {
