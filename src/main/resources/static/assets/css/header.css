@@ -1,0 +1,19 @@
+.header-container {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 var(--header-padding-x);
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 100%;
+
+  background: #fff; /* чтобы под контентом не просвечивало */
+  border-bottom: 1px solid var(--color-border);
+}
+
+.logo-button-container {
+  width: 128px;
+  height: 55px;
+  border: none;
+  background-color: var(--color-bg);
+}
