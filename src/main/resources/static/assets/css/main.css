@@ -140,11 +140,11 @@ header {
 
 .cart-badge {
   position: absolute;
-  top: -5px;      /* смещение вверх, чтобы кружочек был наполовину сверху */
-  right: -5px;    /* смещение вправо */
+  top: -5px;
+  right: -5px;
   background: #156DF9;
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   width: 20px;
   height: 20px;
   display: flex;
@@ -152,7 +152,7 @@ header {
   justify-content: center;
   border-radius: 50%;
   font-weight: bold;
-  border: 1px solid white; /* опционально, чтобы отделять от иконки */
+  border: 1px solid white;
 }
 
 .search-submit-button {

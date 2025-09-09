@@ -1,4 +1,3 @@
-/* 🎨 Глобальные переменные */
 :root {
   --font-family-base: "Noto Sans", sans-serif;
   --font-style-base: normal;
@@ -15,7 +14,6 @@
   --spacing-sm: 36px;
 }
 
-/* 📌 Индекс CPI */
 .cpi-container {
   display: flex;
   justify-content: center;
@@ -33,7 +31,6 @@
   color: var(--color-text-primary);
 }
 
-/* 🛒 Корзина */
 .order-grid {
   display: flex;
   flex-direction: column;
@@ -45,7 +42,6 @@
   padding-bottom: var(--spacing-sm);
 }
 
-/* 🔘 Кнопка */
 .order-button-container {
   display: flex;
   align-items: center;
