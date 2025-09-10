@@ -9,14 +9,14 @@
   --color-accent: #156DF9;
 
   --radius-sm: 4px;
-  --spacing-lg: 80px;
+  --spacing-lg: 200px;
   --spacing-md: 48px;
   --spacing-sm: 36px;
 }
 
 .cpi-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   align-self: stretch;
   padding: var(--spacing-md) var(--spacing-lg) 32px var(--spacing-lg);
