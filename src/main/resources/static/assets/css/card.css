@@ -128,6 +128,14 @@
   width: 100%;
 }
 
+.card__description-wrapper {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  width: 100%;
+  min-height: 33px;
+}
+
 .card__metadata-text {
   color: var(--color-text-secondary);
   font-size: var(--font-size-meta);
