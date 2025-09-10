@@ -55,7 +55,7 @@
 
   font-family: var(--font-family-base);
   font-style: var(--font-style-base);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   line-height: var(--line-height-base);
 
@@ -63,5 +63,34 @@
 }
 
 .order-button-container:hover {
+  cursor: pointer;
+}
+
+.cart-buttons-wrapper {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-button-container {
+  display: inline-flex;
+  height: 44px;
+  padding: 13px;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1px solid #E8EDF1;
+  background: #FFF;
+
+  color: #586179;
+  font-family: var(--font-family-base);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.delete-button-container:hover {
   cursor: pointer;
 }
