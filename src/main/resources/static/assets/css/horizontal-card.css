@@ -55,12 +55,10 @@
 
 .horizontal-card-title-container {
   display: flex;
-  width: 175px;
-  max-width: 175px;
-  padding-top: 12px;
+  width: 100%;
+  max-width: 230px;
   justify-content: center;
   align-items: center;
-  gap: 10px;
   align-self: stretch;
 }
 
@@ -82,7 +80,6 @@
   display: flex;
   width: 200px;
   max-width: 200px;
-  padding-top: 12px;
   justify-content: center;
   align-items: center;
   gap: 10px;
@@ -94,7 +91,7 @@
   font-family: "Noto Sans";
   font-size: 12px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   line-height: normal;
   flex: 1 0 0;
 }

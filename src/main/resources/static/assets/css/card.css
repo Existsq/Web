@@ -51,7 +51,6 @@
   align-items: flex-start;
   width: 100%;
   padding: var(--card-padding);
-  padding-bottom: 0;
   gap: var(--card-gap);
 }
 
