@@ -49,10 +49,14 @@
           <div class="card__title-wrapper">
             <p class="card__title" th:text="${s.title}"></p>
           </div>
-          <div class="card__info">
-            <div class="card__index" th:text="${s.index}"></div>
-            <div class="card__button">Добавить услугу</div>
+          <div>
+            <p class="card__metadata-text"
+               th:text="${s.shortDescription}"></p>
           </div>
+          <!--          <div class="card__info">-->
+          <!--            <div class="card__index" th:text="${s.index}"></div>-->
+          <!--            <div class="card__button">Добавить услугу</div>-->
+          <!--          </div>-->
         </div>
 
         <div class="card__footer">
