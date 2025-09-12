@@ -1,20 +1,20 @@
 package com.bmstu.lab.repository.service;
 
 import com.bmstu.lab.exception.NotFoundException;
-import com.bmstu.lab.model.Service;
+import com.bmstu.lab.model.Category;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InMemoryServiceRepository implements ServiceRepository {
+public class InMemoryCategoryRepository implements CategoryRepository {
 
-  private final Map<Long, List<Service>> orderStorage =
+  private final Map<Long, List<Category>> orderStorage =
       Map.of(
           1L,
           List.of(
-              new Service(
+              new Category(
                   1L,
                   "Продукты питания",
                   4.9,
@@ -22,7 +22,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
                   1L,
                   "Продукты питания составляют основную часть бюджета семьи. В эту категорию входят ежедневные покупки: мясо, рыба, молочные продукты, овощи, фрукты, хлеб, крупы и напитки. Рост цен на продукты моментально отражается на уровне жизни, так как отказаться от этой статьи расходов невозможно. Продукты питания формируют базовую корзину, от которой зависит расчет персонального индекса инфляции.",
                   "Основные расходы семьи на еду"),
-              new Service(
+              new Category(
                   2L,
                   "ЖКХ",
                   4.5,
@@ -31,9 +31,9 @@ public class InMemoryServiceRepository implements ServiceRepository {
                   "Жилищно-коммунальные услуги включают оплату электричества, газа, воды, отопления и вывоза мусора. Это обязательные расходы, которые не зависят от уровня доходов семьи и требуют регулярной оплаты. В условиях сезонных изменений, например, в отопительный период, затраты могут значительно возрастать. Повышение тарифов на коммунальные услуги напрямую влияет на инфляцию и уровень доступного дохода населения.",
                   "Коммунальные платежи за жильё")));
 
-  private final List<Service> serviceStorage =
+  private final List<Category> categoryStorage =
       List.of(
-          new Service(
+          new Category(
               1L,
               "Продукты питания",
               4.9,
@@ -41,7 +41,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               1L,
               "Продукты питания составляют основную часть бюджета семьи. В эту категорию входят ежедневные покупки: мясо, рыба, молочные продукты, овощи, фрукты, хлеб, крупы и напитки. Рост цен на продукты моментально отражается на уровне жизни, так как отказаться от этой статьи расходов невозможно. Продукты питания формируют базовую корзину, от которой зависит расчет персонального индекса инфляции.",
               "Основные расходы семьи на еду"),
-          new Service(
+          new Category(
               2L,
               "ЖКХ",
               4.5,
@@ -49,7 +49,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               2L,
               "Жилищно-коммунальные услуги включают оплату электричества, газа, воды, отопления и вывоза мусора. Это обязательные расходы, которые не зависят от уровня доходов семьи и требуют регулярной оплаты. В условиях сезонных изменений, например, в отопительный период, затраты могут значительно возрастать. Повышение тарифов на коммунальные услуги напрямую влияет на инфляцию и уровень доступного дохода населения.",
               "Коммунальные платежи за жильё"),
-          new Service(
+          new Category(
               3L,
               "Транспорт",
               3.8,
@@ -57,7 +57,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               3L,
               "Расходы на транспорт включают покупку топлива, оплату общественного транспорта, парковок, а также техническое обслуживание автомобилей. Для жителей крупных городов эта статья расходов играет ключевую роль, так как напрямую влияет на мобильность. Колебания цен на бензин и дизельное топливо отражаются на конечных ценах товаров и услуг. Таким образом, транспортная категория оказывает значительное влияние на расчёт персонального индекса инфляции.",
               "Бензин, транспорт, парковки"),
-          new Service(
+          new Category(
               4L,
               "Связь и интернет",
               3.5,
@@ -65,7 +65,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               4L,
               "Современная жизнь невозможна без мобильной связи и доступа в интернет. В категорию входят расходы на тарифные планы мобильных операторов, домашний интернет, а также подписки на онлайн-сервисы: видео, музыка, облачные хранилища. Несмотря на относительно небольшую долю в бюджете, эта категория является социальной необходимостью. Удорожание связи и интернет-услуг снижает доступность цифровых сервисов для населения.",
               "Расходы на связь и интернет"),
-          new Service(
+          new Category(
               5L,
               "Одежда и обувь",
               2.9,
@@ -73,7 +73,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               5L,
               "Категория включает расходы на сезонные покупки одежды, обуви и аксессуаров. Сюда входят базовые предметы гардероба, верхняя одежда и спортивная форма. Для семей с детьми эта статья расходов особенно важна, так как одежду приходится обновлять регулярно. Изменение цен на одежду и обувь влияет на потребительские привычки и может привести к увеличению или сокращению доли расходов в других категориях.",
               "Сезонные траты на гардероб"),
-          new Service(
+          new Category(
               6L,
               "Здравоохранение",
               3.2,
@@ -81,7 +81,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               6L,
               "Медицинские расходы охватывают посещение врачей, покупку лекарств, оплату анализов и профилактических мероприятий. Даже при наличии бесплатной медицины часть услуг оплачивается самостоятельно: стоматология, диагностика, витамины и медицинские препараты. Эта категория считается чувствительной, так как напрямую связана с качеством и продолжительностью жизни. Рост цен на медицинские услуги оказывает сильное влияние на ощущение личной инфляции.",
               "Расходы на здоровье и медицину"),
-          new Service(
+          new Category(
               7L,
               "Образование и досуг",
               2.7,
@@ -89,7 +89,7 @@ public class InMemoryServiceRepository implements ServiceRepository {
               7L,
               "В категорию входят расходы на книги, кружки, секции, фитнес, кино и культурные мероприятия. Современные семьи также активно используют онлайн-образовательные платформы и курсы. Эта статья расходов отражает стремление к саморазвитию и поддержанию качества жизни. Хотя досуг не относится к обязательным тратам, он играет важную роль в расчёте персонального индекса, так как при сокращении доходов обычно урезается в первую очередь.",
               "Книги, кружки, развлечения"),
-          new Service(
+          new Category(
               8L,
               "Кафе и рестораны",
               2.4,
@@ -99,29 +99,29 @@ public class InMemoryServiceRepository implements ServiceRepository {
               "Походы в кафе и доставка еды"));
 
   @Override
-  public List<Service> findAll() {
-    return serviceStorage;
+  public List<Category> findAll() {
+    return categoryStorage;
   }
 
   @Override
-  public List<Service> findByTitle(String title) {
-    return serviceStorage.stream()
+  public List<Category> findByTitle(String title) {
+    return categoryStorage.stream()
         .filter(
-            service ->
-                service.title().toLowerCase(Locale.ROOT).startsWith(title.toLowerCase(Locale.ROOT)))
+            category ->
+                category.title().toLowerCase(Locale.ROOT).startsWith(title.toLowerCase(Locale.ROOT)))
         .toList();
   }
 
   @Override
-  public Service findById(Long id) {
-    return serviceStorage.stream()
-        .filter(service -> service.id().equals(id))
+  public Category findById(Long id) {
+    return categoryStorage.stream()
+        .filter(category -> category.id().equals(id))
         .findFirst()
         .orElseThrow(() -> new NotFoundException("Услуга с id=" + id + "не найдена"));
   }
 
   @Override
-  public List<Service> findServicesByCart(Long id) {
+  public List<Category> findServicesByCart(Long id) {
     return orderStorage.get(id);
   }
 }

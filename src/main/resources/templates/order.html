@@ -20,32 +20,32 @@
 </div>
 <div class="order-grid">
 
-  <div class="ordered-container" th:each="service, iterStat : ${services}">
+  <div class="ordered-container" th:each="category, iterStat : ${categories}">
 <!--    <div class="number-container">-->
 <!--      <p class="number-text" th:text="${iterStat.index + 1}">1</p>-->
 <!--    </div>-->
 
     <div class="horizontal-card-container">
       <div class="horizontal-card-image-container"
-           th:style="|background-image: url('http://127.0.0.1:9000/images/${service.imageId}.jpg')|">
+           th:style="|background-image: url('http://127.0.0.1:9000/images/${category.imageId}.jpg')|">
       </div>
       <div class="horizontal-card-content-container">
 
         <div class="horizontal-card-title-container">
-          <p class="horizontal-card-title-text" th:text="${service.title}">Категория</p>
+          <p class="horizontal-card-title-text" th:text="${category.title}">Категория</p>
         </div>
 
         <div class="horizontal-card-description-container">
-          <p class="horizontal-card-description-text" th:text="${service.shortDescription}">
+          <p class="horizontal-card-description-text" th:text="${category.shortDescription}">
             Описание</p>
         </div>
 
         <div class="horizontal-card-index-container">
-          <p class="horizontal-card-index-text" th:text="${service.index}">4.8</p>
+          <p class="horizontal-card-index-text" th:text="${category.index}">4.8</p>
         </div>
 
         <input class="horizontal-card-input-container"
-               th:placeholder="${service.basePrice} + ' руб.'">
+               th:placeholder="${category.basePrice} + ' руб.'">
       </div>
     </div>
 

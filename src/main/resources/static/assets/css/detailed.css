@@ -47,6 +47,12 @@
   align-items: center;
   gap: 10px;
   align-self: stretch;
+  color: #101D40;
+  font-family: "Noto Sans";
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
 }
 
 .detailed-card-title-text {

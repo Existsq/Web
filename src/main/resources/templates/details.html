@@ -2,7 +2,7 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${service.title}">РИП | Услуга</title>
+  <title th:text="${category.title}">РИП | Услуга</title>
   <link rel="stylesheet" th:href="@{/assets/css/main.css}">
   <link rel="stylesheet" th:href="@{/assets/css/header.css}">
   <link rel="stylesheet" th:href="@{/assets/css/detailed.css}">
@@ -18,8 +18,8 @@
         <div class="inner-text-header-container">
 
           <div class="inner-title-container">
-            <h1 class="detailed-service-title-text"
-                th:text="${service.title}">
+            <h1 class="detailed-category-title-text"
+                th:text="${category.title}">
               Название Услуги
             </h1>
           </div>
@@ -27,14 +27,14 @@
           <div class="inner-info-container">
             <div class="inner-index-container">
               <h3 class="inner-secondary-text"
-                  th:text="'Изменение индекса с прошлого месяца: ' + ${service.index} + '%'">
+                  th:text="'Изменение индекса с прошлого месяца: ' + ${category.index} + '%'">
                 Изменение индекса с прошлого месяца:
               </h3>
             </div>
 
             <div class="inner-price-container">
               <h3 class="inner-secondary-text"
-                  th:text="'Базовая стоимость: ' + ${service.basePrice} + ' руб'">
+                  th:text="'Базовая стоимость: ' + ${category.basePrice} + ' руб'">
                 Базовая стоимость:
               </h3>
             </div>
@@ -44,14 +44,14 @@
 
         <div class="inner-description-container">
           <p class="inner-description-text"
-             th:text="${service.description}">
+             th:text="${category.description}">
             Текст описания услуги
           </p>
         </div>
       </div>
 
       <div class="inner-image-container"
-           th:style="|background-image: url('http://127.0.0.1:9000/images/${service.imageId}.jpg')|">
+           th:style="|background-image: url('http://127.0.0.1:9000/images/${category.imageId}.jpg')|">
 
       </div>
 
