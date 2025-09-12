@@ -1,6 +1,6 @@
 package com.bmstu.lab.model;
 
-public record Service(
+public record Category(
     Long id,
     String title,
     double index,
