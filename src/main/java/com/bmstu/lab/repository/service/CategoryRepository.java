@@ -11,5 +11,5 @@ public interface CategoryRepository {
 
   Category findById(Long id);
 
-  List<Category> findServicesByCart(Long id);
+  List<Category> findCategoriesByCart(Long id);
 }

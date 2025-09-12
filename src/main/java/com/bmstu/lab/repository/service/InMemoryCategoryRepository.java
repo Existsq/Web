@@ -108,7 +108,10 @@ public class InMemoryCategoryRepository implements CategoryRepository {
     return categoryStorage.stream()
         .filter(
             category ->
-                category.title().toLowerCase(Locale.ROOT).startsWith(title.toLowerCase(Locale.ROOT)))
+                category
+                    .title()
+                    .toLowerCase(Locale.ROOT)
+                    .startsWith(title.toLowerCase(Locale.ROOT)))
         .toList();
   }
 
@@ -121,7 +124,7 @@ public class InMemoryCategoryRepository implements CategoryRepository {
   }
 
   @Override
-  public List<Category> findServicesByCart(Long id) {
+  public List<Category> findCategoriesByCart(Long id) {
     return orderStorage.get(id);
   }
 }
