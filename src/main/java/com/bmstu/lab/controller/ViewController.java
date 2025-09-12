@@ -35,7 +35,7 @@ public class ViewController {
 
     model.addAttribute("categories", categories);
     model.addAttribute("query", query);
-    model.addAttribute("cart", categoryRepository.findServicesByCart(1L).size());
+    model.addAttribute("cart", categoryRepository.findCategoriesByCart(1L).size());
     model.addAttribute("baseUrl", MINIO_BASE_URL);
 
     return "main";
@@ -44,13 +44,15 @@ public class ViewController {
   @GetMapping("/category/{id}")
   public String getCategoryById(@PathVariable Long id, Model model) {
     model.addAttribute("category", categoryRepository.findById(id));
+    model.addAttribute("baseUrl", MINIO_BASE_URL);
 
     return "details";
   }
 
   @GetMapping("/cart/{id}")
   public String getCart(@PathVariable Long id, Model model) {
-    model.addAttribute("categories", categoryRepository.findServicesByCart(id));
+    model.addAttribute("categories", categoryRepository.findCategoriesByCart(id));
+    model.addAttribute("baseUrl", MINIO_BASE_URL);
 
     return "order";
   }
