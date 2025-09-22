@@ -94,3 +94,53 @@
 .delete-button-container:hover {
   cursor: pointer;
 }
+/* Общий контейнер формы */
+.date-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+/* Лейблы */
+.date-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #101D40;
+}
+
+/* Поля для ввода дат */
+.date-input-start{
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #333;
+  background-color: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.date-input-start:focus{
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 4px rgba(74, 144, 226, 0.4);
+}
+
+/* Кнопки */
+.date-submit-start {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #156DF9;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.date-submit-start:hover{
+  background-color: #1B61D1;
+}
