@@ -12,7 +12,7 @@
 <div class="main-page-container">
   <header th:insert="~{fragments/header :: header}"></header>
   <div class="search-section">
-    <form th:action="@{/}" method="get" class="search-form-container">
+    <form th:action="@{/categories}" method="get" class="search-form-container">
       <div class="search-container">
         <div class="search-icon-container">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -23,9 +23,9 @@
           </svg>
         </div>
 
-        <input type="text" name="query" class="search-input"
-               placeholder="Введите название услуги"
-               th:value="${query}">
+        <input type="text" name="title" class="search-input"
+               placeholder="Введите название категории"
+               th:value="${title}">
       </div>
 
       <button type="submit" class="search-submit-button">Найти</button>
@@ -44,7 +44,7 @@
 
   <div class="cards-container">
     <div th:each="s : ${categories}" class="card">
-      <a th:href="@{/category/{id}(id=${s.id})}" class="card-link">
+      <a th:href="@{/categories/{id}(id=${s.id})}" class="card-link">
         <div class="card__header">
           <div class="card__title-wrapper">
             <p class="card__title" th:text="${s.title}"></p>

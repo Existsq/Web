@@ -14,16 +14,22 @@
 <header th:insert="~{fragments/header :: header}"></header>
 
 <div class="cpi-container">
-  <p class="cpi-text">Услуг в корзине: 2 шт.</p>
-  <p class="cpi-text">Ваш персональный ИПЦ - 113.4%</p>
+  <form class="date-form">
+    <label for="startDate" class="date-label">Выберите дату для сравнения:</label>
+    <input type="date" id="startDate" name="startDate" class="date-input-start">
+    <input type="submit" value="Установить" class="date-submit-start">
+  </form>
+  <p class="cpi-text">
+    Ваш персональный ИПЦ - <span th:text="${cpi}">13.2</span>%
+  </p>
 
 </div>
 <div class="order-grid">
 
   <div class="ordered-container" th:each="category, iterStat : ${categories}">
-<!--    <div class="number-container">-->
-<!--      <p class="number-text" th:text="${iterStat.index + 1}">1</p>-->
-<!--    </div>-->
+    <div class="number-container">
+      <p class="number-text" th:text="${iterStat.index + 1}">1</p>
+    </div>
 
     <div class="horizontal-card-container">
       <div class="horizontal-card-image-container"
@@ -40,9 +46,9 @@
             Описание</p>
         </div>
 
-        <div class="horizontal-card-index-container">
-          <p class="horizontal-card-index-text" th:text="${category.index}">4.8</p>
-        </div>
+        <!--        <div class="horizontal-card-index-container">-->
+        <!--          <p class="horizontal-card-index-text" th:text="${category.index}">4.8</p>-->
+        <!--        </div>-->
 
         <input class="horizontal-card-input-container"
                th:placeholder="${category.basePrice} + ' руб.'">
