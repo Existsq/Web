@@ -6,4 +6,5 @@ public record Category(
     int basePrice,
     Long imageId,
     String description,
+    double coefficient,
     String shortDescription) {}
