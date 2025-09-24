@@ -1,25 +1,69 @@
 package com.bmstu.lab.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Entity
+@Table(name = "orders")
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private LocalDate startDate;
-  private LocalDate endDate;
-  private List<OrderCategory> orderCategories;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private OrderStatus status = OrderStatus.DRAFT;
+
+  @Column(name = "created_at", nullable = false)
+  private LocalDateTime createdAt = LocalDateTime.now();
+
+  @Column(name = "formed_at")
+  private LocalDateTime formedAt;
+
+  @Column(name = "completed_at")
+  private LocalDateTime completedAt;
+
+  @Column(name = "comparison_date")
+  private LocalDate comparisonDate;
+
+  @ManyToOne
+  @JoinColumn(name = "creator_id", nullable = false)
+  private User creator;
+
+  @ManyToOne
+  @JoinColumn(name = "moderator_id")
+  private User moderator;
+
+  @Column(name = "personal_cpi")
   private Double personalCPI;
 
-  public Order(
-      Long id, LocalDate startDate, LocalDate endDate, List<OrderCategory> orderCategories) {
-    this.id = id;
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.orderCategories = orderCategories;
-    this.personalCPI = calculatePersonalCPI();
-  }
+  @OneToMany(
+      mappedBy = "order",
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  private List<OrderCategory> orderCategories = new ArrayList<>();
 
   private Double calculatePersonalCPI() {
     return 13.2;
