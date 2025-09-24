@@ -1,5 +1,6 @@
 package com.bmstu.lab.controller;
 
+import com.bmstu.lab.exception.NotFoundException;
 import com.bmstu.lab.model.CartSummary;
 import com.bmstu.lab.model.Category;
 import com.bmstu.lab.model.Order;
@@ -54,6 +55,18 @@ public class ViewController {
         .findById(id)
         .ifPresent(category -> orderService.addCategoryToOrder(1L, id, category));
     return "redirect:/categories";
+  }
+
+  @GetMapping("/categories/{id}")
+  public String getCategoryById(@PathVariable Long id, Model model) {
+    model.addAttribute(
+        "category",
+        categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Категория с таким id не найдена")));
+    model.addAttribute("baseUrl", MINIO_BASE_URL);
+
+    return "category-detailed";
   }
 
   @GetMapping("/calculate-cpi/{id}")
