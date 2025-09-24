@@ -20,6 +20,11 @@
   align-items: center;
   align-self: stretch;
   padding: var(--spacing-md) var(--spacing-lg) 32px var(--spacing-lg);
+
+  position: sticky;
+  top: 0; /* расстояние от верхней границы контейнера */
+  background-color: white; /* чтобы не перекрывалось другими элементами */
+  z-index: 1000; /* чтобы был поверх остальных блоков */
 }
 
 .cpi-text {
@@ -94,6 +99,7 @@
 .delete-button-container:hover {
   cursor: pointer;
 }
+
 /* Общий контейнер формы */
 .date-form {
   display: flex;
@@ -107,10 +113,11 @@
   font-size: 16px;
   font-weight: 500;
   color: #101D40;
+  font-family: var(--font-family-base);
 }
 
 /* Поля для ввода дат */
-.date-input-start{
+.date-input-start {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -123,7 +130,7 @@
   -moz-appearance: none;
 }
 
-.date-input-start:focus{
+.date-input-start:focus {
   border-color: #4a90e2;
   outline: none;
   box-shadow: 0 0 4px rgba(74, 144, 226, 0.4);
@@ -141,6 +148,6 @@
   cursor: pointer;
 }
 
-.date-submit-start:hover{
+.date-submit-start:hover {
   background-color: #1B61D1;
 }

@@ -7,7 +7,7 @@
   <link rel="stylesheet" th:href="@{/assets/css/header.css}">
   <link rel="stylesheet" th:href="@{/assets/css/main.css}">
   <link rel="stylesheet" th:href="@{/assets/css/horizontal-card.css}">
-  <title>РИП | Корзина</title>
+  <title>РИП | Рассчет ИПЦ</title>
 </head>
 <body>
 
@@ -20,7 +20,7 @@
     <input type="submit" value="Установить" class="date-submit-start">
   </form>
   <p class="cpi-text">
-    Ваш персональный ИПЦ - <span th:text="${cpi}">13.2</span>%
+    Ваш персональный ИПЦ - <span th:text="${cpi}"></span>%
   </p>
 
 </div>
@@ -46,9 +46,13 @@
             Описание</p>
         </div>
 
-        <!--        <div class="horizontal-card-index-container">-->
-        <!--          <p class="horizontal-card-index-text" th:text="${category.index}">4.8</p>-->
-        <!--        </div>-->
+        <div class="horizontal-card-index-container">
+          <p class="horizontal-card-index-text"
+             th:text="${category.coefficient % 1 == 0} ?
+             ${#numbers.formatDecimal(category.coefficient, 0, 0)} + '%' :
+             ${#numbers.formatDecimal(category.coefficient, 1, 1)} + '%'">
+          </p>
+        </div>
 
         <input class="horizontal-card-input-container"
                th:placeholder="${category.basePrice} + ' руб.'">
@@ -69,9 +73,11 @@
     <button class="order-button-container">
       Оформить заявку
     </button>
-    <button class="delete-button-container">
-      Удалить заявку
-    </button>
+    <form th:action="@{/orders/delete}" method="post">
+      <button type="submit" class="delete-button-container">
+        Удалить заявку
+      </button>
+    </form>
   </div>
 </div>
 

@@ -1,7 +1,19 @@
 spring:
   application:
     name: rip-backend
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/labdb
+    username: labuser
+    password: labpass
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
 server:
   port: 8080
 

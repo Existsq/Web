@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>РИП | Список Услуг</title>
+  <title>РИП | Категории</title>
   <link rel="stylesheet" th:href="@{/assets/css/main.css}">
   <link rel="stylesheet" th:href="@{/assets/css/card.css}">
   <link rel="stylesheet" th:href="@{/assets/css/header.css}">
@@ -31,7 +31,7 @@
       <button type="submit" class="search-submit-button">Найти</button>
     </form>
 
-    <a th:href="@{/calculate-cpi/1}" class="cart-icon-wrapper">
+    <a th:if="${cart > 0}" th:href="@{/calculate-cpi/1}" class="cart-icon-wrapper">
       <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
            viewBox="0 0 16 16" fill="none">
         <path
@@ -50,25 +50,24 @@
             <p class="card__title" th:text="${s.title}"></p>
           </div>
           <div class="card__description-wrapper">
-            <p class="card__metadata-text"
-               th:text="${s.shortDescription}"></p>
+            <p class="card__metadata-text" th:text="${s.shortDescription}"></p>
           </div>
-          <!--          <div class="card__info">-->
-          <!--            <div class="card__index" th:text="${s.index}"></div>-->
-          <!--            <div class="card__button">Добавить услугу</div>-->
-          <!--          </div>-->
         </div>
-
         <div class="card__footer">
           <div class="card__metadata">
             <p class="card__metadata-text"
                th:text="'Базовая стоимость: ' + ${s.basePrice} + ' руб.'"></p>
           </div>
           <div class="card__image"
-               th:style="|background-image: url(${baseUrl}${s.imageId}.jpg)|">
-          </div>
+               th:style="|background-image: url(${baseUrl}${s.imageId}.jpg)|"></div>
         </div>
       </a>
+
+      <div class="card__info">
+        <form th:action="@{/categories/add/{id}(id=${s.id})}" class="card__form-container" method="post">
+          <button type="submit" class="card__button">Добавить категорию</button>
+        </form>
+      </div>
     </div>
   </div>
 

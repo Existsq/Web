@@ -37,7 +37,6 @@
   font-family: var(--font-family-base);
   height: fit-content;
   transition: border 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
 }
 
 .card:hover {
@@ -76,9 +75,18 @@
 
 .card__info {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 16px;
   width: 100%;
+}
+
+.card__form-container {
+  padding-bottom: 10px;
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card__index,
@@ -91,6 +99,7 @@
   font-size: var(--font-size-text);
   line-height: normal;
   text-align: center;
+  cursor: pointer;
 }
 
 .card__index {
