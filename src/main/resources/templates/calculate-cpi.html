@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" th:href="@{/assets/css/order.css}">
+  <link rel="stylesheet" th:href="@{/assets/css/calculateCpi.css}">
   <link rel="stylesheet" th:href="@{/assets/css/header.css}">
   <link rel="stylesheet" th:href="@{/assets/css/main.css}">
   <link rel="stylesheet" th:href="@{/assets/css/horizontal-card.css}">
@@ -24,7 +24,7 @@
   </p>
 
 </div>
-<div class="order-grid">
+<div class="calculateCpi-grid">
 
   <div class="ordered-container" th:each="category, iterStat : ${categories}">
     <div class="number-container">
@@ -70,7 +70,7 @@
   </div>
 
   <div class="cart-buttons-wrapper">
-<!--    <button class="order-button-container">-->
+<!--    <button class="calculateCpi-button-container">-->
 <!--      Оформить заявку-->
 <!--    </button>-->
     <form th:action="@{/orders/delete}" method="post">
