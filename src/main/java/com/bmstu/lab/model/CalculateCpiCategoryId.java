@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderCategoryId implements Serializable {
+public class CalculateCpiCategoryId implements Serializable {
   private Long order;
   private Long category;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof OrderCategoryId that)) return false;
+    if (!(o instanceof CalculateCpiCategoryId that)) return false;
     return Objects.equals(order, that.order) && Objects.equals(category, that.category);
   }
 

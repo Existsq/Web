@@ -7,18 +7,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_categories")
-@IdClass(OrderCategoryId.class)
+@Table(name = "calculate_cpi_categories")
+@IdClass(CalculateCpiCategoryId.class)
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderCategory {
+public class CalculateCpiCategory {
 
   @Id
   @ManyToOne
   @JoinColumn(name = "order_id", nullable = false)
-  private Order order;
+  private CalculateCpi calculateCpi;
 
   @Id
   @ManyToOne

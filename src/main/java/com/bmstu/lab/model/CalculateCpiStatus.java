@@ -1,6 +1,6 @@
 package com.bmstu.lab.model;
 
-public enum OrderStatus {
+public enum CalculateCpiStatus {
   DRAFT, // черновик (корзина)
   DELETED, // удалена (логическое удаление)
   FORMED, // сформирована пользователем

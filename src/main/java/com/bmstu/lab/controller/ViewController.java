@@ -1,9 +1,9 @@
 package com.bmstu.lab.controller;
 
 import com.bmstu.lab.exception.NotFoundException;
-import com.bmstu.lab.model.CartSummary;
+import com.bmstu.lab.model.dto.CartSummary;
 import com.bmstu.lab.model.Category;
-import com.bmstu.lab.model.Order;
+import com.bmstu.lab.model.CalculateCpi;
 import com.bmstu.lab.repository.category.CategoryRepository;
 import com.bmstu.lab.service.OrderService;
 import java.util.List;
@@ -38,8 +38,8 @@ public class ViewController {
             ? categoryRepository.findByTitleContainingIgnoreCase(title)
             : categoryRepository.findAll();
 
-    Order order = orderService.getOrCreateDraftOrder(1L);
-    int cartSize = order.getOrderCategories().size();
+    CalculateCpi calculateCpi = orderService.getOrCreateDraftOrder(1L);
+    int cartSize = calculateCpi.getOrderCategories().size();
 
     model.addAttribute("categories", categories);
     model.addAttribute("title", title);

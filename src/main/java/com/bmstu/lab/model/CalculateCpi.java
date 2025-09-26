@@ -22,12 +22,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "calculate_cpi")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+public class CalculateCpi {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class Order {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private OrderStatus status = OrderStatus.DRAFT;
+  private CalculateCpiStatus status = CalculateCpiStatus.DRAFT;
 
   @Column(name = "created_at", nullable = false)
   private LocalDateTime createdAt = LocalDateTime.now();
@@ -63,7 +63,7 @@ public class Order {
   @OneToMany(
       mappedBy = "order",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<OrderCategory> orderCategories = new ArrayList<>();
+  private List<CalculateCpiCategory> orderCategories = new ArrayList<>();
 
   private Double calculatePersonalCPI() {
     return 13.2;

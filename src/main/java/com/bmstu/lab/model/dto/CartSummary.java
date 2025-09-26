@@ -1,5 +1,6 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.model.dto;
 
+import com.bmstu.lab.model.Category;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
