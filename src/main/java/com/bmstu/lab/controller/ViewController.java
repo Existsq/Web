@@ -6,7 +6,7 @@ import com.bmstu.lab.entity.Category;
 import com.bmstu.lab.exception.NotFoundException;
 import com.bmstu.lab.repository.category.CategoryRepository;
 import com.bmstu.lab.service.CartService;
-import com.bmstu.lab.service.OrderService;
+import com.bmstu.lab.service.CalculateCpiService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ViewController {
 
   private final CategoryRepository categoryRepository;
-  private final OrderService orderService;
+  private final CalculateCpiService calculateCpiService;
   private final CartService cartService;
   private final String MINIO_BASE_URL;
 
   public ViewController(
       CategoryRepository categoryRepository,
-      OrderService orderService,
+      CalculateCpiService calculateCpiService,
       CartService cartService,
       @Value("${minio.base-url}") String MINIO_BASE_URL) {
     this.categoryRepository = categoryRepository;
-    this.orderService = orderService;
+    this.calculateCpiService = calculateCpiService;
     this.cartService = cartService;
     this.MINIO_BASE_URL = MINIO_BASE_URL;
   }
@@ -42,8 +42,8 @@ public class ViewController {
             ? categoryRepository.findByTitleContainingIgnoreCase(title)
             : categoryRepository.findAll();
 
-    CalculateCpi calculateCpi = orderService.getOrCreateDraftOrder(1L);
-    int cartSize = calculateCpi.getOrderCategories().size();
+    CalculateCpi calculateCpi = calculateCpiService.getOrCreateDraftCalculateCpi(1L);
+    int cartSize = calculateCpi.getCalculateCpiCategories().size();
 
     model.addAttribute("categories", categories);
     model.addAttribute("title", title);
@@ -58,7 +58,7 @@ public class ViewController {
   public String addCategoryToCart(@PathVariable Long id) {
     categoryRepository
         .findById(id)
-        .ifPresent(category -> cartService.addCategoryToOrder(1L, id, category));
+        .ifPresent(category -> cartService.addCategoryToCalculateCpi(1L, id, category));
     return "redirect:/categories";
   }
 
@@ -89,9 +89,9 @@ public class ViewController {
     return "calculate-cpi";
   }
 
-  @PostMapping("/orders/delete")
+  @PostMapping("/calculate-cpi/delete")
   public String deleteCart() {
-    orderService.deleteDraftOrder(1L);
+    calculateCpiService.deleteDraftCalculateCpi(1L);
     return "redirect:/categories";
   }
 }

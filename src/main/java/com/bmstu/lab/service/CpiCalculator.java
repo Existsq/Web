@@ -10,19 +10,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class CpiCalculator {
 
-  public double calculateTotalSpent(List<CalculateCpiCategory> orderCategories) {
-    return orderCategories.stream().mapToDouble(CalculateCpiCategory::getUserSpent).sum();
+  public double calculateTotalSpent(List<CalculateCpiCategory> calculateCpiCategories) {
+    return calculateCpiCategories.stream().mapToDouble(CalculateCpiCategory::getUserSpent).sum();
   }
 
-  public double calculatePersonalCPI(List<CalculateCpiCategory> orderCategories) {
-    return orderCategories.stream()
+  public double calculatePersonalCPI(List<CalculateCpiCategory> calculateCpiCategories) {
+    return calculateCpiCategories.stream()
         .mapToDouble(oc -> oc.getUserSpent() / oc.getCategory().getBasePrice())
         .sum();
   }
 
   public List<Category> mapToCategoriesWithCoefficient(
-      List<CalculateCpiCategory> orderCategories, double totalSpent) {
-    return orderCategories.stream()
+      List<CalculateCpiCategory> calculateCpiCategories, double totalSpent) {
+    return calculateCpiCategories.stream()
         .map(
             oc -> {
               Category category = oc.getCategory();

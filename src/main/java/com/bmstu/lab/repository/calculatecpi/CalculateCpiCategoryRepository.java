@@ -1,4 +1,4 @@
-package com.bmstu.lab.repository.order;
+package com.bmstu.lab.repository.calculatecpi;
 
 import com.bmstu.lab.entity.CalculateCpi;
 import com.bmstu.lab.entity.CalculateCpiCategory;

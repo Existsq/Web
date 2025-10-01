@@ -4,8 +4,8 @@ import com.bmstu.lab.dto.CartSummaryDTO;
 import com.bmstu.lab.entity.CalculateCpi;
 import com.bmstu.lab.entity.CalculateCpiCategory;
 import com.bmstu.lab.entity.Category;
-import com.bmstu.lab.repository.order.CalculateCpiCategoryRepository;
-import com.bmstu.lab.repository.order.OrderRepository;
+import com.bmstu.lab.repository.calculatecpi.CalculateCpiCategoryRepository;
+import com.bmstu.lab.repository.calculatecpi.CalculateCpiRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CartService {
 
-    private final OrderService orderService;
+    private final CalculateCpiService calculateCpiService;
     private final CalculateCpiCategoryRepository categoryRepository;
-    private final OrderRepository orderRepository;
+    private final CalculateCpiRepository calculateCpiRepository;
     private final CpiCalculator cpiCalculator;
 
-    public void addCategoryToOrder(Long userId, Long categoryId, Category category) {
-        CalculateCpi calculateCpi = orderService.getOrCreateDraftOrder(userId);
+    public void addCategoryToCalculateCpi(Long userId, Long categoryId, Category category) {
+        CalculateCpi calculateCpi = calculateCpiService.getOrCreateDraftCalculateCpi(userId);
 
         boolean exists = categoryRepository.findByCalculateCpi(calculateCpi).stream()
                 .anyMatch(oc -> oc.getCategory().getId().equals(categoryId));
@@ -35,20 +35,20 @@ public class CartService {
     }
 
     public CartSummaryDTO calculateCartSummary(Long userId) {
-        CalculateCpi calculateCpi = orderService.getDraftOrder(userId);
+        CalculateCpi calculateCpi = calculateCpiService.getDraftCalculateCpi(userId);
         if (calculateCpi == null) {
             return new CartSummaryDTO(0.0, List.of());
         }
 
-        List<CalculateCpiCategory> orderCategories = categoryRepository.findByCalculateCpi(calculateCpi);
+        List<CalculateCpiCategory> calculateCpiCategories = categoryRepository.findByCalculateCpi(calculateCpi);
 
-        double totalSpent = cpiCalculator.calculateTotalSpent(orderCategories);
-        double personalCPI = cpiCalculator.calculatePersonalCPI(orderCategories);
+        double totalSpent = cpiCalculator.calculateTotalSpent(calculateCpiCategories);
+        double personalCPI = cpiCalculator.calculatePersonalCPI(calculateCpiCategories);
 
         calculateCpi.setPersonalCPI(personalCPI);
-        orderRepository.save(calculateCpi);
+        calculateCpiRepository.save(calculateCpi);
 
-        List<Category> categories = cpiCalculator.mapToCategoriesWithCoefficient(orderCategories, totalSpent);
+        List<Category> categories = cpiCalculator.mapToCategoriesWithCoefficient(calculateCpiCategories, totalSpent);
 
         return new CartSummaryDTO(personalCPI, categories);
     }

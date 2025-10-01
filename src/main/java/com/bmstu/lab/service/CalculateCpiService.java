@@ -3,42 +3,42 @@ package com.bmstu.lab.service;
 import com.bmstu.lab.entity.CalculateCpi;
 import com.bmstu.lab.entity.CalculateCpiStatus;
 import com.bmstu.lab.entity.User;
-import com.bmstu.lab.repository.order.OrderRepository;
+import com.bmstu.lab.repository.calculatecpi.CalculateCpiRepository;
 import com.bmstu.lab.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class CalculateCpiService {
 
-  private final OrderRepository orderRepository;
+  private final CalculateCpiRepository calculateCpiRepository;
   private final UserRepository userRepository;
 
-  public CalculateCpi getOrCreateDraftOrder(Long userId) {
-    return orderRepository
+  public CalculateCpi getOrCreateDraftCalculateCpi(Long userId) {
+    return calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
-        .orElseGet(() -> createDraftOrder(userId));
+        .orElseGet(() -> createDraftCalculateCpi(userId));
   }
 
-  private CalculateCpi createDraftOrder(Long userId) {
+  private CalculateCpi createDraftCalculateCpi(Long userId) {
     User user = userRepository.getReferenceById(userId);
     CalculateCpi newCalculateCpi = new CalculateCpi();
     newCalculateCpi.setStatus(CalculateCpiStatus.DRAFT);
     newCalculateCpi.setCreator(user);
     newCalculateCpi.setPersonalCPI(0.0);
-    return orderRepository.save(newCalculateCpi);
+    return calculateCpiRepository.save(newCalculateCpi);
   }
 
-  public CalculateCpi getDraftOrder(Long userId) {
-    return orderRepository
+  public CalculateCpi getDraftCalculateCpi(Long userId) {
+    return calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
         .orElse(null);
   }
 
-  public void deleteDraftOrder(Long userId) {
-    orderRepository
+  public void deleteDraftCalculateCpi(Long userId) {
+    calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
-        .ifPresent(calculateCpi -> orderRepository.deleteOrder(calculateCpi.getId()));
+        .ifPresent(calculateCpi -> calculateCpiRepository.deleteCalculateCpi(calculateCpi.getId()));
   }
 }

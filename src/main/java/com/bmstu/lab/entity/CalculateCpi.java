@@ -63,7 +63,7 @@ public class CalculateCpi {
   @OneToMany(
       mappedBy = "calculateCpi",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<CalculateCpiCategory> orderCategories = new ArrayList<>();
+  private List<CalculateCpiCategory> calculateCpiCategories = new ArrayList<>();
 
   private Double calculatePersonalCPI() {
     return 13.2;
