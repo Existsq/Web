@@ -5,8 +5,8 @@ import com.bmstu.lab.entity.CalculateCpi;
 import com.bmstu.lab.entity.Category;
 import com.bmstu.lab.exception.NotFoundException;
 import com.bmstu.lab.repository.category.CategoryRepository;
-import com.bmstu.lab.service.CartService;
 import com.bmstu.lab.service.CalculateCpiService;
+import com.bmstu.lab.service.CartService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -92,6 +92,11 @@ public class ViewController {
   @PostMapping("/calculate-cpi/delete")
   public String deleteCart() {
     calculateCpiService.deleteDraftCalculateCpi(1L);
+    return "redirect:/categories";
+  }
+
+  @GetMapping("/")
+  public String redirectToCategories() {
     return "redirect:/categories";
   }
 }
