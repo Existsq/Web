@@ -1,4 +1,4 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

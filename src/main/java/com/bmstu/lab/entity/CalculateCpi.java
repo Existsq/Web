@@ -1,4 +1,4 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -61,7 +61,7 @@ public class CalculateCpi {
   private Double personalCPI;
 
   @OneToMany(
-      mappedBy = "order",
+      mappedBy = "calculateCpi",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<CalculateCpiCategory> orderCategories = new ArrayList<>();
 

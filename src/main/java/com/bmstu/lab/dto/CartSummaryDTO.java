@@ -1,6 +1,6 @@
-package com.bmstu.lab.model.dto;
+package com.bmstu.lab.dto;
 
-import com.bmstu.lab.model.Category;
+import com.bmstu.lab.entity.Category;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartSummary {
+public class CartSummaryDTO {
   private double personalCPI;
   private List<Category> categories;
 }

@@ -1,4 +1,4 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.entity;
 
 public enum CalculateCpiStatus {
   DRAFT, // черновик (корзина)

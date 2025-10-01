@@ -1,4 +1,4 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ public class CalculateCpiCategory {
 
   @Id
   @ManyToOne
-  @JoinColumn(name = "order_id", nullable = false)
+  @JoinColumn(name = "calculate_cpi_id", nullable = false)
   private CalculateCpi calculateCpi;
 
   @Id

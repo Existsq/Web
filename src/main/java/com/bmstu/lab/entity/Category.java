@@ -1,6 +1,6 @@
-package com.bmstu.lab.model;
+package com.bmstu.lab.entity;
 
-import static com.bmstu.lab.model.CategoryStatus.ACTIVE;
+import static com.bmstu.lab.entity.CategoryStatus.ACTIVE;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

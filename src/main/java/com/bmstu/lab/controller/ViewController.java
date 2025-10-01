@@ -1,10 +1,11 @@
 package com.bmstu.lab.controller;
 
+import com.bmstu.lab.dto.CartSummaryDTO;
+import com.bmstu.lab.entity.CalculateCpi;
+import com.bmstu.lab.entity.Category;
 import com.bmstu.lab.exception.NotFoundException;
-import com.bmstu.lab.model.dto.CartSummary;
-import com.bmstu.lab.model.Category;
-import com.bmstu.lab.model.CalculateCpi;
 import com.bmstu.lab.repository.category.CategoryRepository;
+import com.bmstu.lab.service.CartService;
 import com.bmstu.lab.service.OrderService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +21,17 @@ public class ViewController {
 
   private final CategoryRepository categoryRepository;
   private final OrderService orderService;
+  private final CartService cartService;
   private final String MINIO_BASE_URL;
 
   public ViewController(
       CategoryRepository categoryRepository,
       OrderService orderService,
+      CartService cartService,
       @Value("${minio.base-url}") String MINIO_BASE_URL) {
     this.categoryRepository = categoryRepository;
     this.orderService = orderService;
+    this.cartService = cartService;
     this.MINIO_BASE_URL = MINIO_BASE_URL;
   }
 
@@ -45,6 +49,7 @@ public class ViewController {
     model.addAttribute("title", title);
     model.addAttribute("cart", cartSize);
     model.addAttribute("baseUrl", MINIO_BASE_URL);
+    model.addAttribute("calculateCpiId", 1L);
 
     return "categories";
   }
@@ -53,7 +58,7 @@ public class ViewController {
   public String addCategoryToCart(@PathVariable Long id) {
     categoryRepository
         .findById(id)
-        .ifPresent(category -> orderService.addCategoryToOrder(1L, id, category));
+        .ifPresent(category -> cartService.addCategoryToOrder(1L, id, category));
     return "redirect:/categories";
   }
 
@@ -71,7 +76,7 @@ public class ViewController {
 
   @GetMapping("/calculate-cpi/{id}")
   public String getCart(@PathVariable Long id, Model model) {
-    CartSummary summary = orderService.calculateCartSummary(id);
+    CartSummaryDTO summary = cartService.calculateCartSummary(1L);
 
     if (summary.getCategories().isEmpty()) {
       return "not-found";
