@@ -4,6 +4,8 @@ import com.bmstu.lab.calculate.cpi.category.model.entity.CalculateCpiCategory;
 import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
+import com.bmstu.lab.category.model.dto.CategoryDTO;
+import com.bmstu.lab.category.model.mapper.CategoryMapper;
 import com.bmstu.lab.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -34,7 +36,7 @@ public class ViewController {
     var categories = categoryService.findAll(title);
 
     CalculateCpi draft = calculateCpiService.getOrCreateDraft(1L);
-    int cartSize = draft.getCalculateCpiCategories().size();
+    int cartSize = draft.getPositions();
 
     model.addAttribute("categories", categories);
     model.addAttribute("title", title);
@@ -49,7 +51,8 @@ public class ViewController {
   public String addCategoryToCart(@PathVariable Long id, Model model) {
     CalculateCpiDTO draft = calculateCpiService.addCategoryToDraft(1L, id);
 
-    model.addAttribute("cart", draft.getCalculateCpiCategories().size());
+    model.addAttribute(
+        "cart", calculateCpiService.getDraft(draft.getId()).getPositions());
 
     return "redirect:/categories";
   }
@@ -73,7 +76,15 @@ public class ViewController {
 
     model.addAttribute(
         "categories",
-        draft.getCalculateCpiCategories().stream().map(CalculateCpiCategory::getCategory).toList());
+        draft.getCalculateCpiCategories().stream()
+            .map(
+                calculateCpiCategory -> {
+                  CategoryDTO categoryDTO =
+                      CategoryMapper.toDto(calculateCpiCategory.getCategory());
+                  categoryDTO.setCoefficient(calculateCpiCategory.getCoefficient());
+                  return categoryDTO;
+                })
+            .toList());
     model.addAttribute("cpi", draft.getPersonalCPI());
     model.addAttribute("baseUrl", MINIO_BASE_URL);
 

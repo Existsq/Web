@@ -20,4 +20,8 @@ public class CalculateCpiCategoryService {
   public CalculateCpiCategory save(CalculateCpiCategory entity) {
     return calculateCpiCategoryRepository.save(entity);
   }
+
+  public void saveAll(List<CalculateCpiCategory> updatedCategories) {
+    calculateCpiCategoryRepository.saveAll(updatedCategories);
+  }
 }

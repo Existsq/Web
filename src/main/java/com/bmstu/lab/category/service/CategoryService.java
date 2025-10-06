@@ -177,7 +177,6 @@ public class CategoryService {
     entity.setImageId(dto.getImageId());
     entity.setDescription(dto.getDescription());
     entity.setShortDescription(dto.getShortDescription());
-    entity.setCoefficient(dto.getCoefficient());
     entity.setStatus(dto.getStatus());
   }
 }

@@ -32,10 +32,6 @@ public class CalculateCpiService {
   private final CategoryService categoryService;
   private final CalculateCpiCategoryService calculateCpiCategoryService;
 
-  /**
-   * Добавляет категорию в заявку-черновик пользователя и сразу пересчитывает personalCPI. Если
-   * черновик отсутствует — создается новый.
-   */
   public CalculateCpiDTO addCategoryToDraft(Long userId, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
     CalculateCpi draft = getOrCreateDraft(userId);
@@ -48,7 +44,7 @@ public class CalculateCpiService {
       CalculateCpiCategory newEntry = new CalculateCpiCategory();
       newEntry.setCalculateCpi(draft);
       newEntry.setCategory(category);
-      newEntry.setUserSpent((double) category.getBasePrice());
+      newEntry.setUserSpent(category.getBasePrice());
       calculateCpiCategoryService.save(newEntry);
     }
 
@@ -56,63 +52,65 @@ public class CalculateCpiService {
     return CalculateCpiMapper.toDto(draft);
   }
 
-  /** Пересчитывает personalCPI и сохраняет черновик. */
   private void recalcDraft(CalculateCpi draft) {
-    double personalCPI = cpiCalculator.calculatePersonalCPI(draft.getCalculateCpiCategories());
+    double personalCPI =
+        cpiCalculator.calculatePersonalCPI(
+            draft.getCalculateCpiCategories(), draft.getComparisonDate());
     draft.setPersonalCPI(personalCPI);
+
+    double totalSpent =
+        draft.getCalculateCpiCategories().stream()
+            .mapToDouble(CalculateCpiCategory::getUserSpent)
+            .sum();
+
+    List<CalculateCpiCategory> updatedCategories =
+        cpiCalculator.mapToCategoriesWithCoefficient(draft.getCalculateCpiCategories(), totalSpent);
+    calculateCpiCategoryService.saveAll(updatedCategories);
+    draft.setPositions(draft.getCalculateCpiCategories().size());
+
     calculateCpiRepository.save(draft);
   }
 
-  /** Возвращает существующую черновую заявку пользователя или создает новую. */
   public CalculateCpi getOrCreateDraft(Long userId) {
     return calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
         .orElseGet(() -> createDraft(userId));
   }
 
-  /** Возвращает черновик, если он есть. */
   public CalculateCpi getDraft(Long userId) {
     return calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
         .orElse(null);
   }
 
-  /** Удаляет текущий черновик пользователя. */
   public void deleteDraft(Long userId) {
     calculateCpiRepository
         .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
         .ifPresent(draft -> calculateCpiRepository.deleteCalculateCpi(draft.getId()));
   }
 
-  /** Создает новую заявку-черновик. */
   private CalculateCpi createDraft(Long userId) {
     var user = userService.getById(userId);
-
     CalculateCpi draft = new CalculateCpi();
     draft.setStatus(CalculateCpiStatus.DRAFT);
     draft.setCreator(user);
     draft.setCreatedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
-
     return calculateCpiRepository.save(draft);
   }
 
-  /** Возвращает ID черновика пользователя и количество услуг */
   public DraftInfoDTO getDraftInfo(Long userId) {
     CalculateCpi draft = getOrCreateDraft(userId);
     int count = draft.getCalculateCpiCategories().size();
     return new DraftInfoDTO(draft.getId(), count);
   }
 
-  /** Получение списка заявок с фильтрацией по дате формирования и статусу */
   public List<CalculateCpiDTO> findAllFiltered(
       LocalDateTime from, LocalDateTime to, CalculateCpiStatus status) {
-
     List<CalculateCpi> list =
         calculateCpiRepository.findByFormedAtBetweenAndStatus(from, to, status);
     return list.stream().map(CalculateCpiMapper::toDto).collect(Collectors.toList());
   }
 
-  /** Получение одной заявки с её услугами */
   public CalculateCpiDTO getById(Long id) {
     CalculateCpi cpi =
         calculateCpiRepository
@@ -121,21 +119,20 @@ public class CalculateCpiService {
     return CalculateCpiMapper.toDto(cpi);
   }
 
-  /** Изменение полей заявки */
   public CalculateCpiDTO update(Long id, CalculateCpiDTO dto) {
-    CalculateCpi cpi =
+    CalculateCpi draft =
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    cpi.setComparisonDate(dto.getComparisonDate());
-    cpi.setStatus(dto.getStatus());
-    calculateCpiRepository.save(cpi);
+    draft.setComparisonDate(dto.getComparisonDate());
+    draft.setStatus(dto.getStatus());
 
-    return CalculateCpiMapper.toDto(cpi);
+    recalcDraft(draft);
+
+    return CalculateCpiMapper.toDto(draft);
   }
 
-  /** Сформировать заявку создателем */
   public CalculateCpiDTO formDraft(Long userId, Long draftId) {
     CalculateCpi draft =
         calculateCpiRepository
@@ -152,30 +149,27 @@ public class CalculateCpiService {
 
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
-    calculateCpiRepository.save(draft);
+
+    recalcDraft(draft);
 
     return CalculateCpiMapper.toDto(draft);
   }
 
-  /** Завершить или отклонить заявку модератором */
   public CalculateCpiDTO denyOrComplete(Long id, Long moderatorId, boolean approve) {
-    CalculateCpi cpi =
+    CalculateCpi draft =
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    cpi.setModerator(userService.getById(moderatorId));
-    cpi.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
-    cpi.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
+    draft.setModerator(userService.getById(moderatorId));
+    draft.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
+    draft.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
 
-    double total = cpiCalculator.calculatePersonalCPI(cpi.getCalculateCpiCategories());
-    cpi.setPersonalCPI(total);
+    recalcDraft(draft);
 
-    calculateCpiRepository.save(cpi);
-    return CalculateCpiMapper.toDto(cpi);
+    return CalculateCpiMapper.toDto(draft);
   }
 
-  /** Удаление заявки (только черновик) */
   public void delete(Long draftId) {
     CalculateCpi draft =
         calculateCpiRepository

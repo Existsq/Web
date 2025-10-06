@@ -64,12 +64,10 @@ public class CalculateCpi {
   @Column(name = "personal_cpi")
   private Double personalCPI;
 
+  @Column private int positions = 0;
+
   @OneToMany(
       mappedBy = "calculateCpi",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<CalculateCpiCategory> calculateCpiCategories = new ArrayList<>();
-
-  private Double calculatePersonalCPI() {
-    return 13.2;
-  }
 }

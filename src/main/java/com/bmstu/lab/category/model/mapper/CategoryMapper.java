@@ -13,7 +13,7 @@ public class CategoryMapper {
         category.getImageId(),
         category.getDescription(),
         category.getShortDescription(),
-        category.getCoefficient(),
+        category.getCoefficient() != null ? category.getCoefficient() : null,
         category.getStatus());
   }
 
@@ -25,7 +25,7 @@ public class CategoryMapper {
         categoryDTO.getImageId(),
         categoryDTO.getDescription(),
         categoryDTO.getShortDescription(),
-        categoryDTO.getCoefficient(),
+        categoryDTO.getCoefficient() != null ? categoryDTO.getCoefficient() : null,
         categoryDTO.getStatus());
   }
 }

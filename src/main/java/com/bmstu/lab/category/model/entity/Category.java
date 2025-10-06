@@ -43,7 +43,7 @@ public class Category {
   @Column(columnDefinition = "TEXT")
   private String shortDescription;
 
-  @Transient private double coefficient;
+  @Transient private Double coefficient;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

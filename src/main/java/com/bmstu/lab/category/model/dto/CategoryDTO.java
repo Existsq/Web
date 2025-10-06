@@ -26,7 +26,7 @@ public class CategoryDTO {
 
   private String shortDescription;
 
-  private double coefficient;
+  private Double coefficient;
 
   private CategoryStatus status = ACTIVE;
 }

@@ -17,9 +17,6 @@ public class CalculateCpiMapper {
         calculateCpi.getComparisonDate(),
         calculateCpi.getCreator() != null ? calculateCpi.getCreator().getId() : null,
         calculateCpi.getModerator() != null ? calculateCpi.getModerator().getId() : null,
-        calculateCpi.getPersonalCPI(),
-        calculateCpi.getCalculateCpiCategories().stream()
-            .map(CalculateCpiCategoryMapper::toDto)
-            .collect(Collectors.toList()));
+        calculateCpi.getPersonalCPI());
   }
 }
