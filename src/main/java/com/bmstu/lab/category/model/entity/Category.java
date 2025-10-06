@@ -33,7 +33,7 @@ public class Category {
   private String title;
 
   @Column(nullable = false)
-  private int basePrice;
+  private double basePrice;
 
   @Column private String imageId;
 

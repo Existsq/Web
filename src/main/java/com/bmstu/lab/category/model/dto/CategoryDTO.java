@@ -18,7 +18,7 @@ public class CategoryDTO {
 
   private String title;
 
-  private int basePrice;
+  private double basePrice;
 
   private String imageId;
 
