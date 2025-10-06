@@ -35,7 +35,7 @@ public class Category {
   @Column(nullable = false)
   private int basePrice;
 
-  @Column private Long imageId;
+  @Column private String imageId;
 
   @Column(columnDefinition = "TEXT")
   private String description;
