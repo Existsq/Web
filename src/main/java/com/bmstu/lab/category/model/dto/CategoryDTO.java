@@ -1,0 +1,32 @@
+package com.bmstu.lab.category.model.dto;
+
+import static com.bmstu.lab.category.model.enums.CategoryStatus.ACTIVE;
+
+import com.bmstu.lab.category.model.enums.CategoryStatus;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class CategoryDTO {
+
+  private Long id;
+
+  private String title;
+
+  private int basePrice;
+
+  private String imageId;
+
+  private String description;
+
+  private String shortDescription;
+
+  private double coefficient;
+
+  private CategoryStatus status = ACTIVE;
+}

@@ -19,7 +19,10 @@ server:
 
 minio:
   base-url: http://127.0.0.1:9000/images/
-  endpoint: http://localhost:9000
+  endpoint: localhost
+  port: 9000
+  secure: true
   key:
-    secret: minio
-    access: minio124
+    secret: minio124
+    access: minio
+  bucket.name: images
