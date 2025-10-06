@@ -1,7 +1,9 @@
 package com.bmstu.lab.calculate.cpi.model.mapper;
 
+import com.bmstu.lab.calculate.cpi.category.model.mapper.CalculateCpiCategoryMapper;
 import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
+import java.util.stream.Collectors;
 
 public class CalculateCpiMapper {
 
@@ -13,8 +15,11 @@ public class CalculateCpiMapper {
         calculateCpi.getFormedAt(),
         calculateCpi.getCompletedAt(),
         calculateCpi.getComparisonDate(),
-        calculateCpi.getCreator().getId(),
-        calculateCpi.getModerator().getId(),
-        calculateCpi.getPersonalCPI());
+        calculateCpi.getCreator() != null ? calculateCpi.getCreator().getId() : null,
+        calculateCpi.getModerator() != null ? calculateCpi.getModerator().getId() : null,
+        calculateCpi.getPersonalCPI(),
+        calculateCpi.getCalculateCpiCategories().stream()
+            .map(CalculateCpiCategoryMapper::toDto)
+            .collect(Collectors.toList()));
   }
 }

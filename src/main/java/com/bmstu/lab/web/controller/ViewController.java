@@ -1,5 +1,7 @@
 package com.bmstu.lab.web.controller;
 
+import com.bmstu.lab.calculate.cpi.category.model.entity.CalculateCpiCategory;
+import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
 import com.bmstu.lab.category.service.CategoryService;
@@ -31,8 +33,8 @@ public class ViewController {
   public String categoriesPage(@RequestParam(required = false) String title, Model model) {
     var categories = categoryService.findAll(title);
 
-    CalculateCpi calculateCpi = calculateCpiService.getOrCreateDraft(1L);
-    int cartSize = calculateCpi.getCalculateCpiCategories().size();
+    CalculateCpi draft = calculateCpiService.getOrCreateDraft(1L);
+    int cartSize = draft.getCalculateCpiCategories().size();
 
     model.addAttribute("categories", categories);
     model.addAttribute("title", title);
@@ -44,8 +46,11 @@ public class ViewController {
   }
 
   @PostMapping("/categories/add/{id}")
-  public String addCategoryToCart(@PathVariable Long id) {
-    calculateCpiService.addCategoryToDraft(1L, id);
+  public String addCategoryToCart(@PathVariable Long id, Model model) {
+    CalculateCpiDTO draft = calculateCpiService.addCategoryToDraft(1L, id);
+
+    model.addAttribute("cart", draft.getCalculateCpiCategories().size());
+
     return "redirect:/categories";
   }
 
@@ -60,14 +65,16 @@ public class ViewController {
 
   @GetMapping("/calculate-cpi/{id}")
   public String getCart(@PathVariable Long id, Model model) {
-    CalculateCpiService.CartSummaryDTO summary = calculateCpiService.calculateCartSummary(id);
+    CalculateCpi draft = calculateCpiService.getDraft(id);
 
-    if (summary.categories().isEmpty()) {
+    if (draft == null || draft.getCalculateCpiCategories().isEmpty()) {
       return "not-found";
     }
 
-    model.addAttribute("categories", summary.categories());
-    model.addAttribute("cpi", summary.personalCPI());
+    model.addAttribute(
+        "categories",
+        draft.getCalculateCpiCategories().stream().map(CalculateCpiCategory::getCategory).toList());
+    model.addAttribute("cpi", draft.getPersonalCPI());
     model.addAttribute("baseUrl", MINIO_BASE_URL);
 
     return "calculate-cpi";

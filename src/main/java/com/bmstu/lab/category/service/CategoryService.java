@@ -30,7 +30,6 @@ public class CategoryService {
    *
    * @param categoryRepository репозиторий для работы с категориями
    * @param minioTemplate шаблон для работы с файлами в MinIO
-   * @param calculateCpiService сервис для работы с черновиком пользователя (CPI)
    */
   public CategoryService(CategoryRepository categoryRepository, MinioTemplate minioTemplate) {
     this.categoryRepository = categoryRepository;

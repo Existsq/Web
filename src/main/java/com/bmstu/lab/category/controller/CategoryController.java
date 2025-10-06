@@ -1,5 +1,7 @@
 package com.bmstu.lab.category.controller;
 
+import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
+import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
 import com.bmstu.lab.category.model.dto.CategoryDTO;
 import com.bmstu.lab.category.service.CategoryService;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CategoryController {
 
   private final CategoryService categoryService;
+  private final CalculateCpiService calculateCpiService;
 
   @GetMapping
   public List<CategoryDTO> findAll(@RequestParam(value = "title", required = false) String title) {
@@ -32,6 +35,13 @@ public class CategoryController {
   @GetMapping("/{categoryId}")
   public CategoryDTO findById(@PathVariable Long categoryId) {
     return categoryService.findById(categoryId);
+  }
+
+  @PostMapping("/{categoryId}/draft")
+  public CalculateCpiDTO addCategoryToDraft(
+      @PathVariable Long categoryId,
+      @RequestParam(required = false, defaultValue = "1") Long userId) {
+    return calculateCpiService.addCategoryToDraft(userId, categoryId);
   }
 
   @PostMapping

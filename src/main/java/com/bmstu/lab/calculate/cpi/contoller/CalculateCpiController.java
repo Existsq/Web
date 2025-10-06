@@ -1,10 +1,16 @@
 package com.bmstu.lab.calculate.cpi.contoller;
 
 import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
+import com.bmstu.lab.calculate.cpi.model.enums.CalculateCpiStatus;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,10 +22,44 @@ public class CalculateCpiController {
 
   private final CalculateCpiService calculateCpiService;
 
-  @PostMapping("/{categoryId}/draft")
-  public CalculateCpiDTO addCategoryToDraft(
-      @PathVariable Long categoryId,
-      @RequestParam(required = false, defaultValue = "1") Long userId) {
-    return calculateCpiService.addCategoryToDraft(userId, categoryId);
+  @GetMapping("/draft-info")
+  public CalculateCpiService.DraftInfoDTO getDraftInfo() {
+    Long userId = 1L;
+    return calculateCpiService.getDraftInfo(userId);
+  }
+
+  @GetMapping
+  public List<CalculateCpiDTO> getAll(
+      @RequestParam(required = false) LocalDateTime from,
+      @RequestParam(required = false) LocalDateTime to,
+      @RequestParam(required = false) CalculateCpiStatus status) {
+    return calculateCpiService.findAllFiltered(from, to, status);
+  }
+
+  @GetMapping("/{id}")
+  public CalculateCpiDTO getById(@PathVariable Long id) {
+    return calculateCpiService.getById(id);
+  }
+
+  @PutMapping("/{id}")
+  public CalculateCpiDTO update(@PathVariable Long id, @RequestBody CalculateCpiDTO dto) {
+    return calculateCpiService.update(id, dto);
+  }
+
+  @PutMapping("/form/{draftId}")
+  public CalculateCpiDTO formDraft(@PathVariable Long draftId) {
+    Long userId = 1L;
+    return calculateCpiService.formDraft(userId, draftId);
+  }
+
+  @PutMapping("/deny/{id}")
+  public CalculateCpiDTO deny(
+      @PathVariable Long id, @RequestParam Long moderatorId, @RequestParam boolean approve) {
+    return calculateCpiService.denyOrComplete(id, moderatorId, approve);
+  }
+
+  @DeleteMapping("/{draftId}")
+  public void delete(@PathVariable Long draftId) {
+    calculateCpiService.delete(draftId);
   }
 }
