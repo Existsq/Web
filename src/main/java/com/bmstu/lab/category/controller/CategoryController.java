@@ -41,8 +41,10 @@ public class CategoryController {
   }
 
   @PostMapping("/{categoryId}/draft")
-  public CategoryDTO addCategoryToDraft(@PathVariable Long categoryId) {
-    return categoryService.addCategoryToDraft(categoryId);
+  public CategoryDTO addCategoryToDraft(
+      @PathVariable Long categoryId,
+      @RequestParam(required = false, defaultValue = "1") Long userId) {
+    return categoryService.addCategoryToDraft(userId, categoryId);
   }
 
   @PutMapping("/{categoryId}")

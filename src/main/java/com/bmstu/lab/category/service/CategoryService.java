@@ -1,12 +1,16 @@
 package com.bmstu.lab.category.service;
 
+import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
+import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
+import com.bmstu.lab.calculate.cpi.model.mapper.CalculateCpiMapper;
+import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
+import com.bmstu.lab.category.exception.CategoryAlreadyExistException;
+import com.bmstu.lab.category.exception.CategoryNotFoundException;
 import com.bmstu.lab.category.model.dto.CategoryDTO;
 import com.bmstu.lab.category.model.entity.Category;
 import com.bmstu.lab.category.model.mapper.CategoryMapper;
-import com.bmstu.lab.category.exception.CategoryAlreadyExistException;
-import com.bmstu.lab.category.exception.CategoryNotFoundException;
-import com.bmstu.lab.minio.MinioTemplate;
 import com.bmstu.lab.category.repository.CategoryRepository;
+import com.bmstu.lab.minio.MinioTemplate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,11 +19,17 @@ import org.springframework.web.multipart.MultipartFile;
 public class CategoryService {
 
   private final CategoryRepository categoryRepository;
-  private final MinioTemplate minioTemplate;
 
-  public CategoryService(CategoryRepository categoryRepository, MinioTemplate minioTemplate) {
+  private final MinioTemplate minioTemplate;
+  private final CalculateCpiService calculateCpiService;
+
+  public CategoryService(
+      CategoryRepository categoryRepository,
+      MinioTemplate minioTemplate,
+      CalculateCpiService calculateCpiService) {
     this.categoryRepository = categoryRepository;
     this.minioTemplate = minioTemplate;
+    this.calculateCpiService = calculateCpiService;
   }
 
   public List<CategoryDTO> findAll(String title) {
@@ -53,9 +63,15 @@ public class CategoryService {
     return CategoryMapper.toDto(categoryRepository.save(category));
   }
 
-  public CategoryDTO addCategoryToDraft(Long categoryId) {
-    // TODO использовать метод в сервисе заявок
-    return new CategoryDTO();
+  public CategoryDTO addCategoryToDraft(Long userId, Long categoryId) {
+    Category category =
+        categoryRepository
+            .findById(categoryId)
+            .orElseThrow(() -> new CategoryNotFoundException("Категория не найдена"));
+
+    calculateCpiService.addCategoryToDraft(userId, category);
+
+    return CategoryMapper.toDto(category);
   }
 
   public CategoryDTO update(Long categoryId, CategoryDTO categoryDTO) {

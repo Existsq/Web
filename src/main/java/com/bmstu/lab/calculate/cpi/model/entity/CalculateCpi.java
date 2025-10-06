@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,7 @@ public class CalculateCpi {
   private CalculateCpiStatus status = CalculateCpiStatus.DRAFT;
 
   @Column(name = "created_at", nullable = false)
-  private LocalDateTime createdAt = LocalDateTime.now();
+  private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
 
   @Column(name = "formed_at")
   private LocalDateTime formedAt;

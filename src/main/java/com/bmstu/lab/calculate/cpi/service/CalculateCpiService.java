@@ -9,6 +9,8 @@ import com.bmstu.lab.calculate.cpi.utils.CpiCalculator;
 import com.bmstu.lab.category.model.entity.Category;
 import com.bmstu.lab.user.model.entity.User;
 import com.bmstu.lab.user.repository.UserRepository;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,6 @@ public class CalculateCpiService {
     CalculateCpi draft = new CalculateCpi();
     draft.setStatus(CalculateCpiStatus.DRAFT);
     draft.setCreator(user);
-    draft.setPersonalCPI(0.0);
     return calculateCpiRepository.save(draft);
   }
 
