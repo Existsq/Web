@@ -183,6 +183,10 @@ public class CalculateCpiService {
     }
   }
 
+  public CalculateCpi getByIdEntity(Long cpiId) {
+    return calculateCpiRepository.getReferenceById(cpiId);
+  }
+
   @Getter
   @AllArgsConstructor
   public static class DraftInfoDTO {

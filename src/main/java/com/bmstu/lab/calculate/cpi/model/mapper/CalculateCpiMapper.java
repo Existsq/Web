@@ -1,9 +1,7 @@
 package com.bmstu.lab.calculate.cpi.model.mapper;
 
-import com.bmstu.lab.calculate.cpi.category.model.mapper.CalculateCpiCategoryMapper;
 import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
-import java.util.stream.Collectors;
 
 public class CalculateCpiMapper {
 
