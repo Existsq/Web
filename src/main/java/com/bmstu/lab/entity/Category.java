@@ -1,7 +1,8 @@
 package com.bmstu.lab.entity;
 
-import static com.bmstu.lab.entity.CategoryStatus.ACTIVE;
+import static com.bmstu.lab.entity.enums.CategoryStatus.ACTIVE;
 
+import com.bmstu.lab.entity.enums.CategoryStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,11 +43,9 @@ public class Category {
   @Column(columnDefinition = "TEXT")
   private String shortDescription;
 
-  @Transient
-  private double coefficient;
+  @Transient private double coefficient;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private CategoryStatus status = ACTIVE;
 }
-

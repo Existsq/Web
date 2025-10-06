@@ -1,5 +1,6 @@
 package com.bmstu.lab.entity;
 
+import com.bmstu.lab.entity.enums.CalculateCpiStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

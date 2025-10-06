@@ -1,7 +1,7 @@
 package com.bmstu.lab.repository.calculatecpi;
 
 import com.bmstu.lab.entity.CalculateCpi;
-import com.bmstu.lab.entity.CalculateCpiStatus;
+import com.bmstu.lab.entity.enums.CalculateCpiStatus;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

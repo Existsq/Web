@@ -8,7 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CalculateCpiCategoryRepository extends JpaRepository<CalculateCpiCategory, CalculateCpiCategoryId> {
+public interface CalculateCpiCategoryRepository
+    extends JpaRepository<CalculateCpiCategory, CalculateCpiCategoryId> {
 
   List<CalculateCpiCategory> findByCalculateCpi(CalculateCpi calculateCpi);
 }

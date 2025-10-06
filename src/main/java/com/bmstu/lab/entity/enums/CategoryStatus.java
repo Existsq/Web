@@ -1,4 +1,4 @@
-package com.bmstu.lab.entity;
+package com.bmstu.lab.entity.enums;
 
 public enum CategoryStatus {
   ACTIVE,

@@ -15,7 +15,8 @@ public class CalculateCpiCategoryId implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof CalculateCpiCategoryId that)) return false;
-    return Objects.equals(calculateCpi, that.calculateCpi) && Objects.equals(category, that.category);
+    return Objects.equals(calculateCpi, that.calculateCpi)
+        && Objects.equals(category, that.category);
   }
 
   @Override

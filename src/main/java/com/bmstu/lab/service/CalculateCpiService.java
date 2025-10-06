@@ -1,8 +1,8 @@
 package com.bmstu.lab.service;
 
 import com.bmstu.lab.entity.CalculateCpi;
-import com.bmstu.lab.entity.CalculateCpiStatus;
 import com.bmstu.lab.entity.User;
+import com.bmstu.lab.entity.enums.CalculateCpiStatus;
 import com.bmstu.lab.repository.calculatecpi.CalculateCpiRepository;
 import com.bmstu.lab.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
