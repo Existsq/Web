@@ -1,4 +1,4 @@
-package com.bmstu.lab.config;
+package com.bmstu.lab.minio.config;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
