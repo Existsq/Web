@@ -11,7 +11,9 @@ import com.bmstu.lab.calculate.cpi.model.enums.CalculateCpiStatus;
 import com.bmstu.lab.calculate.cpi.model.mapper.CalculateCpiMapper;
 import com.bmstu.lab.calculate.cpi.repository.CalculateCpiRepository;
 import com.bmstu.lab.calculate.cpi.utils.CpiCalculator;
+import com.bmstu.lab.category.model.dto.CategoryDTO;
 import com.bmstu.lab.category.model.entity.Category;
+import com.bmstu.lab.category.model.mapper.CategoryMapper;
 import com.bmstu.lab.category.service.CategoryService;
 import com.bmstu.lab.user.exception.UserNotFoundException;
 import com.bmstu.lab.user.model.entity.User;
@@ -36,7 +38,7 @@ public class CalculateCpiService {
   private final CalculateCpiCategoryService calculateCpiCategoryService;
   private final UserRepository userRepository;
 
-  public CalculateCpiDTO addCategoryToDraft(Long userId, Long categoryId) {
+  public CategoryDTO addCategoryToDraft(Long userId, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
     CalculateCpi draft = getOrCreateDraft(userId);
 
@@ -53,7 +55,7 @@ public class CalculateCpiService {
     }
 
     recalcDraft(draft);
-    return CalculateCpiMapper.toDto(draft);
+    return CategoryMapper.toDto(category);
   }
 
   private void recalcDraft(CalculateCpi draft) {
@@ -104,8 +106,7 @@ public class CalculateCpiService {
 
   public DraftInfoDTO getDraftInfo(Long userId) {
     CalculateCpi draft = getOrCreateDraft(userId);
-    int count = draft.getCalculateCpiCategories().size();
-    return new DraftInfoDTO(draft.getId(), count);
+    return new DraftInfoDTO(draft.getId(), draft.getPositions());
   }
 
   public List<CalculateCpiDTO> findAllFiltered(
@@ -120,7 +121,10 @@ public class CalculateCpiService {
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
-    return CalculateCpiMapper.toDto(cpi);
+
+    List<CalculateCpiCategory> calculateCpiCategories =
+        calculateCpiCategoryService.findByCalculateCpi(cpi);
+    return CalculateCpiMapper.toDtoWithCategories(cpi, calculateCpiCategories);
   }
 
   public CalculateCpiDTO update(Long id, CalculateCpiDTO dto) {
@@ -173,7 +177,7 @@ public class CalculateCpiService {
             .findById(draftId)
             .orElseThrow(() -> new DraftNotFoundException("Черновик не найден"));
 
-    if (!draft.getCreator().getId().equals(userId)) {
+    if (!draft.getCreator().getId().equals(userId) || !draft.getCreator().isModerator()) {
       throw new UnauthorizedDraftAccessException("Нельзя формировать чужой черновик");
     }
 
@@ -183,8 +187,6 @@ public class CalculateCpiService {
 
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
-
-    recalcDraft(draft);
 
     return CalculateCpiMapper.toDto(draft);
   }
@@ -199,16 +201,18 @@ public class CalculateCpiService {
     draft.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
 
-    recalcDraft(draft);
-
     return CalculateCpiMapper.toDto(draft);
   }
 
-  public void delete(Long draftId) {
+  public void delete(Long draftId, Long userId) {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(draftId)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+
+    if (!draft.getCreator().isModerator() || !draft.getCreator().getId().equals(userId)) {
+      throw new UnauthorizedDraftAccessException("Нельзя удалить чужую заявку");
+    }
 
     this.deleteDraft(draft.getCreator().getId());
   }

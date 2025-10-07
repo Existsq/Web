@@ -73,6 +73,6 @@ public class CalculateCpiController {
 
   @DeleteMapping("/{draftId}")
   public void delete(@PathVariable Long draftId) {
-    calculateCpiService.delete(draftId);
+    calculateCpiService.delete(draftId, 1L);
   }
 }

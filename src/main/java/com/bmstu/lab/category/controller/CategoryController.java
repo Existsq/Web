@@ -1,6 +1,5 @@
 package com.bmstu.lab.category.controller;
 
-import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
 import com.bmstu.lab.category.model.dto.CategoryDTO;
 import com.bmstu.lab.category.service.CategoryService;
@@ -38,9 +37,8 @@ public class CategoryController {
   }
 
   @PostMapping("/{categoryId}/draft")
-  public CalculateCpiDTO addCategoryToDraft(
-      @PathVariable Long categoryId,
-      @RequestParam(required = false, defaultValue = "1") Long userId) {
+  public CategoryDTO addCategoryToDraft(@PathVariable Long categoryId, Long userId) {
+    userId = 1L;
     return calculateCpiService.addCategoryToDraft(userId, categoryId);
   }
 
