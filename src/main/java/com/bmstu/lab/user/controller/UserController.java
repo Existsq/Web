@@ -40,13 +40,14 @@ public class UserController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDTO> getCurrentUser(@RequestBody UserRegistrationDTO dto) {
-    return ResponseEntity.ok(userService.getCurrentUser(dto.getUsername()));
+  public ResponseEntity<UserDTO> getCurrentUser() {
+    String username = "user";
+    return ResponseEntity.ok(userService.getCurrentUser(username));
   }
 
   @PutMapping("/me")
   public ResponseEntity<UserDTO> updateUser(@RequestBody UserRegistrationDTO dto) {
-    String username = "new_user";
+    String username = "user";
     return ResponseEntity.ok(userService.updateUser(username, dto));
   }
 }

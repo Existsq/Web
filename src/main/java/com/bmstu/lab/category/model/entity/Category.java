@@ -41,7 +41,7 @@ public class Category {
 
   @Column(columnDefinition = "TEXT")
   private String shortDescription;
-  
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private CategoryStatus status = ACTIVE;

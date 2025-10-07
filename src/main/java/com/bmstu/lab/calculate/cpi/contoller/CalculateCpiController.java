@@ -66,9 +66,8 @@ public class CalculateCpiController {
   }
 
   @PutMapping("/deny/{id}")
-  public CalculateCpiDTO deny(
-      @PathVariable Long id, @RequestParam Long moderatorId, @RequestParam boolean approve) {
-    return calculateCpiService.denyOrComplete(id, moderatorId, approve);
+  public CalculateCpiDTO deny(@PathVariable Long id, @RequestParam boolean approve) {
+    return calculateCpiService.denyOrComplete(id, 2L, approve);
   }
 
   @DeleteMapping("/{draftId}")

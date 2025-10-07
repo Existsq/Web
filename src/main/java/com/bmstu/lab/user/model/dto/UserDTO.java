@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private Long id;
-    private String username;
-    private boolean isModerator;
+  private Long id;
+  private String username;
+  private boolean isModerator;
 }

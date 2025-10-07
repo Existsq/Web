@@ -105,7 +105,10 @@ public class CalculateCpiService {
   }
 
   public DraftInfoDTO getDraftInfo(Long userId) {
-    CalculateCpi draft = getOrCreateDraft(userId);
+    CalculateCpi draft = getDraft(userId);
+    if (draft == null) {
+      throw new DraftNotFoundException("Черновик не найден");
+    }
     return new DraftInfoDTO(draft.getId(), draft.getPositions());
   }
 

@@ -6,15 +6,15 @@ import com.bmstu.lab.user.model.entity.User;
 
 public class UserMapper {
 
-    public static UserDTO toDto(User user) {
-        return new UserDTO(user.getId(), user.getUsername(), user.isModerator());
-    }
+  public static UserDTO toDto(User user) {
+    return new UserDTO(user.getId(), user.getUsername(), user.isModerator());
+  }
 
-    public static User fromRegistrationDto(UserRegistrationDTO dto) {
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword()); // лучше хешировать
-        user.setModerator(false);
-        return user;
-    }
+  public static User fromRegistrationDto(UserRegistrationDTO dto) {
+    User user = new User();
+    user.setUsername(dto.getUsername());
+    user.setPassword(dto.getPassword()); // лучше хешировать
+    user.setModerator(false);
+    return user;
+  }
 }
