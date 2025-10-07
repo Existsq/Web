@@ -5,6 +5,7 @@ import com.bmstu.lab.calculate.cpi.category.model.entity.CalculateCpiCategoryId;
 import com.bmstu.lab.calculate.cpi.category.repository.CalculateCpiCategoryRepository;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
 import com.bmstu.lab.category.model.entity.Category;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class CalculateCpiCategoryService {
     calculateCpiCategoryRepository.saveAll(updatedCategories);
   }
 
+  @Transactional
   public void delete(CalculateCpi cpi, Category category) {
     calculateCpiCategoryRepository.deleteByCalculateCpiAndCategory(cpi, category);
   }
