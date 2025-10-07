@@ -1,5 +1,7 @@
 package com.bmstu.lab.user.service;
 
+import com.bmstu.lab.user.exception.DuplicateUserException;
+import com.bmstu.lab.user.exception.InvalidCredentialsException;
 import com.bmstu.lab.user.exception.UserNotFoundException;
 import com.bmstu.lab.user.model.dto.UserDTO;
 import com.bmstu.lab.user.model.dto.UserRegistrationDTO;
@@ -25,7 +27,7 @@ public class UserService {
 
   public UserDTO register(UserRegistrationDTO dto) {
     if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-      throw new RuntimeException("Пользователь с таким именем уже существует");
+      throw new DuplicateUserException("Пользователь с таким именем уже существует");
     }
 
     User user = UserMapper.fromRegistrationDto(dto);
@@ -37,15 +39,16 @@ public class UserService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
     return UserMapper.toDto(user);
   }
 
   public UserDTO updateUser(String username, UserRegistrationDTO dto) {
+    username = "new_user";
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 
     if (dto.getUsername() != null) user.setUsername(dto.getUsername());
     if (dto.getPassword() != null) user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -57,10 +60,10 @@ public class UserService {
     User user =
         userRepository
             .findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("Неверный логин или пароль"));
+            .orElseThrow(() -> new InvalidCredentialsException("Неверный логин или пароль"));
 
     if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-      throw new RuntimeException("Неверный логин или пароль");
+      throw new InvalidCredentialsException("Неверный логин или пароль");
     }
 
     return user;

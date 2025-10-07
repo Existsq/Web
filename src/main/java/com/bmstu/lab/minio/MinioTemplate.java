@@ -22,7 +22,7 @@ public class MinioTemplate implements MinioOperations {
   }
 
   public String uploadFile(MultipartFile file) {
-    String fileName = UUID.randomUUID().toString() + ".jpg";
+    String fileName = UUID.randomUUID() + ".jpg";
 
     try (InputStream inputStream = file.getInputStream()) {
       minioClient.putObject(
@@ -34,7 +34,7 @@ public class MinioTemplate implements MinioOperations {
       throw new RuntimeException("Failed to upload file to MinIO", e);
     }
 
-    return fileName;
+    return fileName.substring(0, fileName.length() - 4);
   }
 
   public void deleteFile(String fileName) {

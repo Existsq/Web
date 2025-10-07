@@ -8,7 +8,6 @@ import com.bmstu.lab.user.model.entity.User;
 import com.bmstu.lab.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,13 +40,12 @@ public class UserController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal String username) {
-    return ResponseEntity.ok(userService.getCurrentUser(username));
+  public ResponseEntity<UserDTO> getCurrentUser(@RequestBody UserRegistrationDTO dto) {
+    return ResponseEntity.ok(userService.getCurrentUser(dto.getUsername()));
   }
 
   @PutMapping("/me")
-  public ResponseEntity<UserDTO> updateUser(
-      @AuthenticationPrincipal String username, @RequestBody UserRegistrationDTO dto) {
-    return ResponseEntity.ok(userService.updateUser(username, dto));
+  public ResponseEntity<UserDTO> updateUser(String username, @RequestBody UserRegistrationDTO dto) {
+    return ResponseEntity.ok(userService.updateUser(dto.getUsername(), dto));
   }
 }

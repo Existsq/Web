@@ -176,11 +176,7 @@ public class CalculateCpiService {
             .findById(draftId)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    if (draft.getFormedAt() == null) {
-      calculateCpiRepository.delete(draft);
-    } else {
-      throw new RuntimeException("Нельзя удалить сформированную заявку");
-    }
+    this.deleteDraft(draft.getCreator().getId());
   }
 
   public CalculateCpi getByIdEntity(Long cpiId) {

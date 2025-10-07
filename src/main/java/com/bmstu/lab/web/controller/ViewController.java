@@ -1,6 +1,5 @@
 package com.bmstu.lab.web.controller;
 
-import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.entity.CalculateCpi;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
 import com.bmstu.lab.category.model.dto.CategoryDTO;
@@ -48,9 +47,7 @@ public class ViewController {
 
   @PostMapping("/categories/add/{id}")
   public String addCategoryToCart(@PathVariable Long id, Model model) {
-    CalculateCpiDTO draft = calculateCpiService.addCategoryToDraft(1L, id);
-
-    model.addAttribute("cart", calculateCpiService.getDraft(draft.getId()).getPositions());
+    calculateCpiService.addCategoryToDraft(1L, id);
 
     return "redirect:/categories";
   }

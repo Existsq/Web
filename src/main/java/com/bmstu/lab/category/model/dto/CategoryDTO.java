@@ -3,6 +3,7 @@ package com.bmstu.lab.category.model.dto;
 import static com.bmstu.lab.category.model.enums.CategoryStatus.ACTIVE;
 
 import com.bmstu.lab.category.model.enums.CategoryStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,8 @@ public class CategoryDTO {
 
   private String shortDescription;
 
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Double coefficient;
 
   private CategoryStatus status = ACTIVE;

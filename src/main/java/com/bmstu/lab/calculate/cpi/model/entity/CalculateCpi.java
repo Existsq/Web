@@ -3,6 +3,7 @@ package com.bmstu.lab.calculate.cpi.model.entity;
 import com.bmstu.lab.calculate.cpi.category.model.entity.CalculateCpiCategory;
 import com.bmstu.lab.calculate.cpi.model.enums.CalculateCpiStatus;
 import com.bmstu.lab.user.model.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -41,16 +41,25 @@ public class CalculateCpi {
   @Column(nullable = false)
   private CalculateCpiStatus status = CalculateCpiStatus.DRAFT;
 
-  @Column(name = "created_at", nullable = false)
-  private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("Europe/Moscow"));
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss",
+      timezone = "Europe/Moscow")
+  private LocalDateTime createdAt;
 
-  @Column(name = "formed_at")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss",
+      timezone = "Europe/Moscow")
   private LocalDateTime formedAt;
 
-  @Column(name = "completed_at")
+  @JsonFormat(
+      shape = JsonFormat.Shape.STRING,
+      pattern = "yyyy-MM-dd'T'HH:mm:ss",
+      timezone = "Europe/Moscow")
   private LocalDateTime completedAt;
 
-  @Column(name = "comparison_date")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private LocalDate comparisonDate;
 
   @ManyToOne
