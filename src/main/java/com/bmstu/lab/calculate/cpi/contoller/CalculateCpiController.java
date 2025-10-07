@@ -4,8 +4,6 @@ import com.bmstu.lab.calculate.cpi.model.dto.CalculateCpiDTO;
 import com.bmstu.lab.calculate.cpi.model.enums.CalculateCpiStatus;
 import com.bmstu.lab.calculate.cpi.service.CalculateCpiService;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,17 +34,7 @@ public class CalculateCpiController {
       @RequestParam(required = false) LocalDate to,
       @RequestParam(required = false) CalculateCpiStatus status) {
 
-    LocalDateTime fromDateTime = null;
-    LocalDateTime toDateTime = null;
-
-    if (from != null) {
-      fromDateTime = from.atStartOfDay();
-    }
-    if (to != null) {
-      toDateTime = to.atTime(LocalTime.MAX);
-    }
-
-    return calculateCpiService.findAllFiltered(fromDateTime, toDateTime, status);
+    return calculateCpiService.findAllFiltered(from, to, status);
   }
 
   @GetMapping("/{id}")
@@ -67,7 +55,7 @@ public class CalculateCpiController {
 
   @PutMapping("/deny/{id}")
   public CalculateCpiDTO deny(@PathVariable Long id, @RequestParam boolean approve) {
-    return calculateCpiService.denyOrComplete(id, 2L, approve);
+    return calculateCpiService.denyOrComplete(id, 1L, approve);
   }
 
   @DeleteMapping("/{draftId}")

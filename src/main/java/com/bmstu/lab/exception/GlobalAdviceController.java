@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -138,6 +139,21 @@ public class GlobalAdviceController {
         .timestamp(Timestamp.valueOf(LocalDateTime.now()))
         .status(String.valueOf(HttpStatus.CONFLICT.value()))
         .error("Пользователь с такими данными уже существует")
+        .message(e.getMessage())
+        .path(request.getRequestURI())
+        .build();
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ErrorResponse handleAccessDenied(AccessDeniedException e, HttpServletRequest request) {
+
+    log.warn("Несанкционированная попытка формирования или завершения заявки: {}", e.getMessage());
+
+    return ErrorResponse.builder()
+        .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+        .status(String.valueOf(HttpStatus.CONFLICT.value()))
+        .error("У вас недостаточно прав для совершения данного действия")
         .message(e.getMessage())
         .path(request.getRequestURI())
         .build();

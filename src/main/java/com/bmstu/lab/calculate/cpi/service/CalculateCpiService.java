@@ -19,12 +19,16 @@ import com.bmstu.lab.user.exception.UserNotFoundException;
 import com.bmstu.lab.user.model.entity.User;
 import com.bmstu.lab.user.repository.UserRepository;
 import com.bmstu.lab.user.service.UserService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,11 +62,11 @@ public class CalculateCpiService {
     return CategoryMapper.toDto(category);
   }
 
-  private void recalcDraft(CalculateCpi draft) {
-    double personalCPI =
-        cpiCalculator.calculatePersonalCPI(
-            draft.getCalculateCpiCategories(), draft.getComparisonDate());
-    draft.setPersonalCPI(personalCPI);
+  public void recalcDraft(CalculateCpi draft) {
+//    double personalCPI =
+//        cpiCalculator.calculatePersonalCPI(
+//            draft.getCalculateCpiCategories(), draft.getComparisonDate());
+//    draft.setPersonalCPI(personalCPI);
 
     double totalSpent =
         draft.getCalculateCpiCategories().stream()
@@ -113,9 +117,36 @@ public class CalculateCpiService {
   }
 
   public List<CalculateCpiDTO> findAllFiltered(
-      LocalDateTime from, LocalDateTime to, CalculateCpiStatus status) {
-    List<CalculateCpi> list =
-        calculateCpiRepository.findByFormedAtBetweenAndStatus(from, to, status);
+      LocalDate from, LocalDate to, CalculateCpiStatus status) {
+
+    List<CalculateCpi> list;
+
+    Predicate<CalculateCpiStatus> checkStatus =
+        (status1) ->
+            status1.equals(CalculateCpiStatus.DRAFT) || status.equals(CalculateCpiStatus.DELETED);
+
+    if (from == null && to == null && status == null) {
+      list = calculateCpiRepository.findAll();
+    } else if (from != null && to != null && status != null) {
+      if (checkStatus.test(status)) {
+        return List.of();
+      }
+      list =
+          calculateCpiRepository.findByFormedAtBetweenAndStatus(
+              LocalDateTime.of(from, LocalTime.MIN), LocalDateTime.of(to, LocalTime.MAX), status);
+    } else if (from != null && to != null) {
+      list =
+          calculateCpiRepository.findByFormedAtBetween(
+              LocalDateTime.of(from, LocalTime.MIN), LocalDateTime.of(to, LocalTime.MAX));
+    } else if (status != null) {
+      if (checkStatus.test(status)) {
+        return List.of();
+      }
+      list = calculateCpiRepository.findByStatus(status);
+    } else {
+      list = calculateCpiRepository.findAll();
+    }
+
     return list.stream().map(CalculateCpiMapper::toDto).collect(Collectors.toList());
   }
 
@@ -180,7 +211,7 @@ public class CalculateCpiService {
             .findById(draftId)
             .orElseThrow(() -> new DraftNotFoundException("Черновик не найден"));
 
-    if (!draft.getCreator().getId().equals(userId) || !draft.getCreator().isModerator()) {
+    if (!draft.getCreator().getId().equals(userId)) {
       throw new UnauthorizedDraftAccessException("Нельзя формировать чужой черновик");
     }
 
@@ -191,20 +222,33 @@ public class CalculateCpiService {
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
 
+    calculateCpiRepository.save(draft);
+
     return CalculateCpiMapper.toDto(draft);
   }
 
   public CalculateCpiDTO denyOrComplete(Long id, Long moderatorId, boolean approve) {
-    CalculateCpi draft =
+    CalculateCpi cpi =
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    draft.setModerator(userService.getById(moderatorId));
-    draft.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
-    draft.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
+    double personalCPI =
+        cpiCalculator.calculatePersonalCPI(
+            cpi.getCalculateCpiCategories(), cpi.getComparisonDate());
+    cpi.setPersonalCPI(personalCPI);
 
-    return CalculateCpiMapper.toDto(draft);
+    User moderator = userService.getById(moderatorId);
+
+    if (!moderator.isModerator()) {
+      throw new AccessDeniedException("Пользователь не имеет прав модератора");
+    }
+
+    cpi.setModerator(moderator);
+    cpi.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
+    cpi.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
+
+    return CalculateCpiMapper.toDto(calculateCpiRepository.save(cpi));
   }
 
   public void delete(Long draftId, Long userId) {
@@ -213,7 +257,7 @@ public class CalculateCpiService {
             .findById(draftId)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    if (!draft.getCreator().isModerator() || !draft.getCreator().getId().equals(userId)) {
+    if (!draft.getCreator().getId().equals(userId)) {
       throw new UnauthorizedDraftAccessException("Нельзя удалить чужую заявку");
     }
 

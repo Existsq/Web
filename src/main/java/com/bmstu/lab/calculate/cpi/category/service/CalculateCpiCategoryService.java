@@ -33,15 +33,13 @@ public class CalculateCpiCategoryService {
     calculateCpiCategoryRepository.deleteByCalculateCpiAndCategory(cpi, category);
   }
 
-  public CalculateCpiCategory update(
-      CalculateCpi cpi, Category category, Double userSpent, Double coefficient) {
+  public CalculateCpiCategory update(CalculateCpi cpi, Category category, Double userSpent) {
     CalculateCpiCategory entity =
         calculateCpiCategoryRepository
             .findById(new CalculateCpiCategoryId(cpi.getId(), category.getId()))
             .orElseThrow(() -> new RuntimeException("Запись не найдена"));
 
     if (userSpent != null) entity.setUserSpent(userSpent);
-    if (coefficient != null) entity.setCoefficient(coefficient);
 
     return calculateCpiCategoryRepository.save(entity);
   }

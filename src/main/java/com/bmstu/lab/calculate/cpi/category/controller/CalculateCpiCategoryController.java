@@ -45,7 +45,9 @@ public class CalculateCpiCategoryController {
     Category category = categoryService.findByIdEntity(categoryId);
 
     CalculateCpiCategory updated =
-        calculateCpiCategoryService.update(cpi, category, dto.getUserSpent(), dto.getCoefficient());
+        calculateCpiCategoryService.update(cpi, category, dto.getUserSpent());
+
+    calculateCpiService.recalcDraft(cpi);
 
     return ResponseEntity.ok(CalculateCpiCategoryMapper.toDto(updated));
   }

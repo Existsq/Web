@@ -3,9 +3,8 @@ spring:
     name: rip-backend
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
-
   datasource:
     url: jdbc:postgresql://localhost:5432/labdb
     username: labuser
@@ -14,6 +13,8 @@ spring:
   sql:
     init:
       mode: always
+  jackson:
+    time-zone: Europe/Moscow
 server:
   port: 8080
 

@@ -24,4 +24,8 @@ public interface CalculateCpiRepository extends JpaRepository<CalculateCpi, Long
 
   List<CalculateCpi> findByFormedAtBetweenAndStatus(
       LocalDateTime from, LocalDateTime to, CalculateCpiStatus status);
+
+  List<CalculateCpi> findByFormedAtBetween(LocalDateTime from, LocalDateTime to);
+
+  List<CalculateCpi> findByStatus(CalculateCpiStatus status);
 }
