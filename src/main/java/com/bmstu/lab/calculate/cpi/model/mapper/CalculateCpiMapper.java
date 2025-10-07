@@ -7,7 +7,6 @@ public class CalculateCpiMapper {
 
   public static CalculateCpiDTO toDto(CalculateCpi calculateCpi) {
     return new CalculateCpiDTO(
-        calculateCpi.getId(),
         calculateCpi.getStatus(),
         calculateCpi.getCreatedAt(),
         calculateCpi.getFormedAt(),

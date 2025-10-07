@@ -13,6 +13,9 @@ import com.bmstu.lab.calculate.cpi.repository.CalculateCpiRepository;
 import com.bmstu.lab.calculate.cpi.utils.CpiCalculator;
 import com.bmstu.lab.category.model.entity.Category;
 import com.bmstu.lab.category.service.CategoryService;
+import com.bmstu.lab.user.exception.UserNotFoundException;
+import com.bmstu.lab.user.model.entity.User;
+import com.bmstu.lab.user.repository.UserRepository;
 import com.bmstu.lab.user.service.UserService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -31,6 +34,7 @@ public class CalculateCpiService {
   private final CpiCalculator cpiCalculator;
   private final CategoryService categoryService;
   private final CalculateCpiCategoryService calculateCpiCategoryService;
+  private final UserRepository userRepository;
 
   public CalculateCpiDTO addCategoryToDraft(Long userId, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
@@ -125,12 +129,42 @@ public class CalculateCpiService {
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
 
-    draft.setComparisonDate(dto.getComparisonDate());
-    draft.setStatus(dto.getStatus());
+    User currentUser =
+        userRepository
+            .findById(1L)
+            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 
-    recalcDraft(draft);
+    if (!currentUser.equals(draft.getCreator()) && !currentUser.isModerator()) {
+      throw new UnauthorizedDraftAccessException("Вы не можете обновлять данную заявку");
+    }
+
+    CalculateCpiStatus newStatus = dto.getStatus();
+    CalculateCpiStatus oldStatus = draft.getStatus();
+
+    if (newStatus != null && !oldStatus.equals(newStatus)) {
+      if (!isStatusChangeAllowed(currentUser, oldStatus, newStatus)) {
+        throw new RuntimeException("Недопустимая смена статуса");
+      }
+      draft.setStatus(newStatus);
+    }
+
+    draft.setComparisonDate(dto.getComparisonDate());
+
+    this.recalcDraft(draft);
 
     return CalculateCpiMapper.toDto(draft);
+  }
+
+  private boolean isStatusChangeAllowed(
+      User user, CalculateCpiStatus oldStatus, CalculateCpiStatus newStatus) {
+    if (user.isModerator()) {
+      return oldStatus == CalculateCpiStatus.FORMED
+          && (newStatus == CalculateCpiStatus.REJECTED
+              || newStatus == CalculateCpiStatus.COMPLETED);
+    } else {
+      return oldStatus == CalculateCpiStatus.DRAFT
+          && (newStatus == CalculateCpiStatus.FORMED || newStatus == CalculateCpiStatus.DELETED);
+    }
   }
 
   public CalculateCpiDTO formDraft(Long userId, Long draftId) {

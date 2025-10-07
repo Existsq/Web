@@ -46,7 +46,7 @@ public class ViewController {
   }
 
   @PostMapping("/categories/add/{id}")
-  public String addCategoryToCart(@PathVariable Long id, Model model) {
+  public String addCategoryToCart(@PathVariable Long id) {
     calculateCpiService.addCategoryToDraft(1L, id);
 
     return "redirect:/categories";

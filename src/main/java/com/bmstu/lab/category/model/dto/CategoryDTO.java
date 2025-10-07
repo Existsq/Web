@@ -27,7 +27,6 @@ public class CategoryDTO {
 
   private String shortDescription;
 
-
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Double coefficient;
 

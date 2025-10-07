@@ -44,11 +44,14 @@ public class UserService {
   }
 
   public UserDTO updateUser(String username, UserRegistrationDTO dto) {
-    username = "new_user";
     User user =
         userRepository
             .findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+    userRepository
+        .findByUsername(dto.getUsername())
+        .orElseThrow(() -> new DuplicateUserException("Указанный новый никнейм уже используется"));
 
     if (dto.getUsername() != null) user.setUsername(dto.getUsername());
     if (dto.getPassword() != null) user.setPassword(passwordEncoder.encode(dto.getPassword()));

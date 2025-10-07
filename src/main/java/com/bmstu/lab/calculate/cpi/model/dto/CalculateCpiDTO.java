@@ -1,6 +1,7 @@
 package com.bmstu.lab.calculate.cpi.model.dto;
 
 import com.bmstu.lab.calculate.cpi.model.enums.CalculateCpiStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -12,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CalculateCpiDTO {
 
-  private Long id;
   private CalculateCpiStatus status;
 
   private LocalDateTime createdAt;
