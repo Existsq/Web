@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/calculate-cpi-categories")
+@RequestMapping("/api/calculate-cpi-categories")
 @RequiredArgsConstructor
 public class CalculateCpiCategoryController {
 
