@@ -21,7 +21,7 @@ server:
   port: 8080
 
 minio:
-  base-url: http://127.0.0.1:9000/images/
+
   endpoint: http://localhost:9000
   key:
     secret: minio124
