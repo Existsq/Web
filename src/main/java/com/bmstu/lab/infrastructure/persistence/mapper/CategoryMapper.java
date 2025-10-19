@@ -10,7 +10,7 @@ public class CategoryMapper {
         category.getId(),
         category.getTitle(),
         category.getBasePrice(),
-        category.getImageId(),
+        category.getImageUUID(),
         category.getDescription(),
         category.getShortDescription(),
         null,
@@ -22,7 +22,7 @@ public class CategoryMapper {
         categoryDTO.getId(),
         categoryDTO.getTitle(),
         categoryDTO.getBasePrice(),
-        categoryDTO.getImageId(),
+        categoryDTO.getImageUUID(),
         categoryDTO.getDescription(),
         categoryDTO.getShortDescription(),
         categoryDTO.getStatus());

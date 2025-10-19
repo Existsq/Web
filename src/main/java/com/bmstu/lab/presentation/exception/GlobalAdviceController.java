@@ -1,13 +1,14 @@
 package com.bmstu.lab.presentation.exception;
 
-import com.bmstu.lab.application.exception.DeletedDraftException;
-import com.bmstu.lab.application.exception.DraftNotFoundException;
-import com.bmstu.lab.application.exception.InvalidDraftException;
-import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
+import com.bmstu.lab.application.exception.CalculateCpiNotFoundException;
 import com.bmstu.lab.application.exception.CategoryAlreadyExistException;
 import com.bmstu.lab.application.exception.CategoryNotFoundException;
+import com.bmstu.lab.application.exception.DeletedDraftException;
+import com.bmstu.lab.application.exception.DraftNotFoundException;
 import com.bmstu.lab.application.exception.DuplicateUsernameException;
 import com.bmstu.lab.application.exception.InvalidCredentialsException;
+import com.bmstu.lab.application.exception.InvalidDraftException;
+import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
 import com.bmstu.lab.application.exception.UserNotFoundException;
 import com.bmstu.lab.presentation.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,13 +65,28 @@ public class GlobalAdviceController {
 
     return ErrorResponse.builder()
         .timestamp(Timestamp.valueOf(LocalDateTime.now()))
-        .status(String.valueOf(HttpStatus.CONFLICT.value()))
+        .status(String.valueOf(HttpStatus.NOT_FOUND.value()))
         .error("Категория не найдена")
         .message(e.getMessage())
         .path(request.getRequestURI())
         .build();
   }
-  
+
+  @ExceptionHandler(CalculateCpiNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ErrorResponse handleCalculateCpiNotFound(
+      CalculateCpiNotFoundException e, HttpServletRequest request) {
+    log.error("Рассчет не найден: {}", e.getMessage());
+
+    return ErrorResponse.builder()
+        .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+        .status(String.valueOf(HttpStatus.NOT_FOUND.value()))
+        .error("Рассчет не найден")
+        .message(e.getMessage())
+        .path(request.getRequestURI())
+        .build();
+  }
+
   @ExceptionHandler(DraftNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ErrorResponse handleDraftNotFound(DraftNotFoundException e, HttpServletRequest request) {
@@ -78,7 +94,7 @@ public class GlobalAdviceController {
 
     return ErrorResponse.builder()
         .timestamp(Timestamp.valueOf(LocalDateTime.now()))
-        .status(String.valueOf(HttpStatus.CONFLICT.value()))
+        .status(String.valueOf(HttpStatus.NOT_FOUND.value()))
         .error("Черновик не найден")
         .message(e.getMessage())
         .path(request.getRequestURI())
@@ -132,7 +148,8 @@ public class GlobalAdviceController {
 
   @ExceptionHandler(DuplicateUsernameException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
-  public ErrorResponse handleDuplicateUser(DuplicateUsernameException e, HttpServletRequest request) {
+  public ErrorResponse handleDuplicateUser(
+      DuplicateUsernameException e, HttpServletRequest request) {
 
     log.warn(
         "Попытка регистрации с уже использованными регистрационными данными: {}", e.getMessage());
@@ -154,7 +171,7 @@ public class GlobalAdviceController {
 
     return ErrorResponse.builder()
         .timestamp(Timestamp.valueOf(LocalDateTime.now()))
-        .status(String.valueOf(HttpStatus.CONFLICT.value()))
+        .status(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
         .error("У вас недостаточно прав для совершения данного действия")
         .message(e.getMessage())
         .path(request.getRequestURI())
@@ -162,6 +179,7 @@ public class GlobalAdviceController {
   }
 
   @ExceptionHandler(DeletedDraftException.class)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<Void> handleDeletedDraft(DeletedDraftException ex) {
     log.error("Получение удаленной заявки: {}", ex.getMessage(), ex);
 
@@ -169,6 +187,7 @@ public class GlobalAdviceController {
   }
 
   @ExceptionHandler(Exception.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseEntity<ErrorResponse> handleOther(Exception ex, HttpServletRequest request) {
     log.error("Необработанная ошибка: {}", ex.getMessage(), ex);
 
@@ -185,6 +204,7 @@ public class GlobalAdviceController {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleValidation(
       MethodArgumentNotValidException ex, HttpServletRequest request) {
     String message =

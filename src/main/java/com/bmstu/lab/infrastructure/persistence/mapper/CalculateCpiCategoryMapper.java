@@ -1,8 +1,8 @@
 package com.bmstu.lab.infrastructure.persistence.mapper;
 
 import com.bmstu.lab.application.dto.CalculateCpiCategoryDTO;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.infrastructure.persistence.entity.Category;
 
 public class CalculateCpiCategoryMapper {
@@ -15,7 +15,7 @@ public class CalculateCpiCategoryMapper {
         entity.getCoefficient());
   }
 
-  public static CalculateCpiCategory fromDto(
+  public static CalculateCpiCategory toEntity(
       CalculateCpiCategoryDTO dto, CalculateCpi cpi, Category category) {
     CalculateCpiCategory entity = new CalculateCpiCategory();
     entity.setCalculateCpi(cpi);

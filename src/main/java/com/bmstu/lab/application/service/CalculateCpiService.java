@@ -1,21 +1,25 @@
 package com.bmstu.lab.application.service;
 
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
+import com.bmstu.lab.application.dto.CalculateCpiDTO;
+import com.bmstu.lab.application.dto.CategoryDTO;
+import com.bmstu.lab.application.exception.CalculateCpiNotFoundException;
+import com.bmstu.lab.application.exception.CategoryNotFoundException;
 import com.bmstu.lab.application.exception.DeletedDraftException;
 import com.bmstu.lab.application.exception.DraftNotFoundException;
 import com.bmstu.lab.application.exception.InvalidDraftException;
+import com.bmstu.lab.application.exception.InvalidStatusChangeException;
 import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
-import com.bmstu.lab.application.dto.CalculateCpiDTO;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
-import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
-import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiMapper;
-import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiRepository;
-import com.bmstu.lab.application.usecase.CpiCalculator;
-import com.bmstu.lab.application.dto.CategoryDTO;
-import com.bmstu.lab.infrastructure.persistence.entity.Category;
-import com.bmstu.lab.infrastructure.persistence.mapper.CategoryMapper;
 import com.bmstu.lab.application.exception.UserNotFoundException;
+import com.bmstu.lab.application.usecase.CpiCalculator;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
+import com.bmstu.lab.infrastructure.persistence.entity.Category;
 import com.bmstu.lab.infrastructure.persistence.entity.User;
+import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
+import com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus;
+import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiMapper;
+import com.bmstu.lab.infrastructure.persistence.mapper.CategoryMapper;
+import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiRepository;
 import com.bmstu.lab.infrastructure.persistence.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +46,11 @@ public class CalculateCpiService {
 
   public CategoryDTO addCategoryToDraft(Long userId, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
+
+    if (category.getStatus().equals(CategoryStatus.DELETED)) {
+      throw new CategoryNotFoundException("Категории не найдено");
+    }
+
     CalculateCpi draft = getOrCreateDraft(userId);
 
     boolean alreadyExists =
@@ -61,10 +70,10 @@ public class CalculateCpiService {
   }
 
   public void recalcDraft(CalculateCpi draft) {
-//    double personalCPI =
-//        cpiCalculator.calculatePersonalCPI(
-//            draft.getCalculateCpiCategories(), draft.getComparisonDate());
-//    draft.setPersonalCPI(personalCPI);
+    //    double personalCPI =
+    //        cpiCalculator.calculatePersonalCPI(
+    //            draft.getCalculateCpiCategories(), draft.getComparisonDate());
+    //    draft.setPersonalCPI(personalCPI);
 
     double totalSpent =
         draft.getCalculateCpiCategories().stream()
@@ -93,7 +102,7 @@ public class CalculateCpiService {
 
   public void deleteDraft(Long userId) {
     calculateCpiRepository
-        .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
+        .findFirstByCreatorId(userId)
         .ifPresent(draft -> calculateCpiRepository.deleteCalculateCpi(draft.getId()));
   }
 
@@ -152,7 +161,7 @@ public class CalculateCpiService {
     CalculateCpi cpi =
         calculateCpiRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
 
     if (cpi.getStatus().equals(CalculateCpiStatus.DELETED)) {
       throw new DeletedDraftException("Попытка получения удаленной заявки");
@@ -167,7 +176,7 @@ public class CalculateCpiService {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
 
     User currentUser =
         userRepository
@@ -183,7 +192,7 @@ public class CalculateCpiService {
 
     if (newStatus != null && !oldStatus.equals(newStatus)) {
       if (!isStatusChangeAllowed(currentUser, oldStatus, newStatus)) {
-        throw new RuntimeException("Недопустимая смена статуса");
+        throw new InvalidStatusChangeException("Недопустимая смена статуса");
       }
       draft.setStatus(newStatus);
     }
@@ -224,16 +233,18 @@ public class CalculateCpiService {
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
 
+    draft.setCalculateCpiCategories(calculateCpiCategoryService.findByCalculateCpi(draft));
+
     calculateCpiRepository.save(draft);
 
-    return CalculateCpiMapper.toDto(draft);
+    return CalculateCpiMapper.toDtoWithCategories(draft, draft.getCalculateCpiCategories());
   }
 
   public CalculateCpiDTO denyOrComplete(Long id, Long moderatorId, boolean approve) {
     CalculateCpi cpi =
         calculateCpiRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найдена"));
 
     double personalCPI =
         cpiCalculator.calculatePersonalCPI(
@@ -250,20 +261,31 @@ public class CalculateCpiService {
     cpi.setCompletedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     cpi.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
 
-    return CalculateCpiMapper.toDto(calculateCpiRepository.save(cpi));
+    CalculateCpi savedCalculateCpi = calculateCpiRepository.save(cpi);
+
+    List<CalculateCpiCategory> calculateCpiCategories =
+        calculateCpiCategoryService.findByCalculateCpi(savedCalculateCpi);
+
+    savedCalculateCpi.setCalculateCpiCategories(calculateCpiCategories);
+
+    return CalculateCpiMapper.toDtoWithCategories(
+        savedCalculateCpi, savedCalculateCpi.getCalculateCpiCategories());
   }
 
   public void delete(Long draftId, Long userId) {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(draftId)
-            .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Расчёт не найден"));
 
-    if (!draft.getCreator().getId().equals(userId)) {
+    boolean isOwner = draft.getCreator().getId().equals(userId);
+    boolean isModerator = draft.getCreator().isModerator();
+
+    if (!isOwner && !isModerator) {
       throw new UnauthorizedDraftAccessException("Нельзя удалить чужую заявку");
     }
 
-    this.deleteDraft(draft.getCreator().getId());
+    this.deleteDraft(draft.getId());
   }
 
   public CalculateCpi getByIdEntity(Long cpiId) {

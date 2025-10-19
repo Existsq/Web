@@ -26,7 +26,7 @@ minio:
   key:
     secret: minio124
     access: minio
-  bucket.name: images
+  bucket.name: categories
 logging:
   level:
     root: error

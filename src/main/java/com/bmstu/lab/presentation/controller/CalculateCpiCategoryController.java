@@ -1,13 +1,13 @@
 package com.bmstu.lab.presentation.controller;
 
 import com.bmstu.lab.application.dto.CalculateCpiCategoryDTO;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
-import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiCategoryMapper;
 import com.bmstu.lab.application.service.CalculateCpiCategoryService;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.application.service.CalculateCpiService;
-import com.bmstu.lab.infrastructure.persistence.entity.Category;
 import com.bmstu.lab.application.service.CategoryService;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
+import com.bmstu.lab.infrastructure.persistence.entity.Category;
+import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiCategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +26,7 @@ public class CalculateCpiCategoryController {
   private final CalculateCpiService calculateCpiService;
   private final CategoryService categoryService;
 
-  @DeleteMapping("/{cpiId}/{categoryId}")
+  @DeleteMapping("/{cpiId}/category/{categoryId}")
   public ResponseEntity<Void> delete(@PathVariable Long cpiId, @PathVariable Long categoryId) {
     CalculateCpi cpi = calculateCpiService.getByIdEntity(cpiId);
     Category category = categoryService.findByIdEntity(categoryId);
@@ -35,7 +35,7 @@ public class CalculateCpiCategoryController {
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/{cpiId}/{categoryId}")
+  @PutMapping("/{cpiId}/category/{categoryId}")
   public ResponseEntity<CalculateCpiCategoryDTO> update(
       @PathVariable Long cpiId,
       @PathVariable Long categoryId,

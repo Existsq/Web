@@ -1,8 +1,8 @@
 package com.bmstu.lab.infrastructure.persistence.repository;
 
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategoryId;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.Category;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

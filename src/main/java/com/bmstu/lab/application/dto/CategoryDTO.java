@@ -3,6 +3,7 @@ package com.bmstu.lab.application.dto;
 import static com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus.ACTIVE;
 
 import com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class CategoryDTO {
 
   private double basePrice;
 
-  private String imageId;
+  private UUID imageUUID;
 
   private String description;
 

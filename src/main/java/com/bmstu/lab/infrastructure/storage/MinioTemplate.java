@@ -1,6 +1,8 @@
 package com.bmstu.lab.infrastructure.storage;
 
 import com.bmstu.lab.application.port.out.MinioOperations;
+import com.bmstu.lab.infrastructure.storage.exception.MinioDeleteFileException;
+import com.bmstu.lab.infrastructure.storage.exception.MinioUploadFileException;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -22,8 +24,9 @@ public class MinioTemplate implements MinioOperations {
     this.bucketName = bucketName;
   }
 
-  public String uploadFile(MultipartFile file) {
-    String fileName = UUID.randomUUID() + ".jpg";
+  public UUID uploadFile(MultipartFile file) {
+    UUID uuid = UUID.randomUUID();
+    String fileName = uuid + ".jpg";
 
     try (InputStream inputStream = file.getInputStream()) {
       minioClient.putObject(
@@ -32,10 +35,10 @@ public class MinioTemplate implements MinioOperations {
               .contentType(file.getContentType())
               .build());
     } catch (Exception e) {
-      throw new RuntimeException("Failed to upload file to MinIO", e);
+      throw new MinioUploadFileException("Ошибка публикации файла в MinIO");
     }
 
-    return fileName.substring(0, fileName.length() - 4);
+    return uuid;
   }
 
   public void deleteFile(String fileName) {
@@ -43,7 +46,7 @@ public class MinioTemplate implements MinioOperations {
       minioClient.removeObject(
           RemoveObjectArgs.builder().bucket(bucketName).object(fileName).build());
     } catch (Exception e) {
-      throw new RuntimeException("Failed to delete file from MinIO", e);
+      throw new MinioDeleteFileException("Ошибка удаления файла из MinIO");
     }
   }
 }

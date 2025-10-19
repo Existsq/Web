@@ -1,8 +1,8 @@
 package com.bmstu.lab.presentation.controller;
 
 import com.bmstu.lab.application.dto.CalculateCpiDTO;
-import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
 import com.bmstu.lab.application.service.CalculateCpiService;
+import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;

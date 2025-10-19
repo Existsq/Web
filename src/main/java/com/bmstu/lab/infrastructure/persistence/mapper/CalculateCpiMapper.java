@@ -1,8 +1,9 @@
 package com.bmstu.lab.infrastructure.persistence.mapper;
 
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.application.dto.CalculateCpiDTO;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
+import com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus;
 import java.util.List;
 
 public class CalculateCpiMapper {
@@ -32,6 +33,9 @@ public class CalculateCpiMapper {
         calculateCpi.getModerator() != null ? calculateCpi.getModerator().getUsername() : null,
         calculateCpi.getPersonalCPI(),
         calculateCpiCategories.stream()
+            .filter(
+                calculateCpiCategory ->
+                    calculateCpiCategory.getCategory().getStatus().equals(CategoryStatus.ACTIVE))
             .map(calculateCpiCategory -> CategoryMapper.toDto(calculateCpiCategory.getCategory()))
             .toList());
   }

@@ -1,9 +1,10 @@
 package com.bmstu.lab.application.service;
 
+import com.bmstu.lab.application.dto.CategoryDTO;
 import com.bmstu.lab.application.exception.CategoryAlreadyExistException;
 import com.bmstu.lab.application.exception.CategoryNotFoundException;
-import com.bmstu.lab.application.dto.CategoryDTO;
 import com.bmstu.lab.infrastructure.persistence.entity.Category;
+import com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus;
 import com.bmstu.lab.infrastructure.persistence.mapper.CategoryMapper;
 import com.bmstu.lab.infrastructure.persistence.repository.CategoryRepository;
 import com.bmstu.lab.infrastructure.storage.MinioTemplate;
@@ -46,9 +47,13 @@ public class CategoryService {
    */
   public List<CategoryDTO> findAll(String title) {
     if (title == null) {
-      return categoryRepository.findAll().stream().map(CategoryMapper::toDto).toList();
+      return categoryRepository.findAllByStatus(CategoryStatus.ACTIVE).stream()
+          .map(CategoryMapper::toDto)
+          .toList();
     } else {
-      return categoryRepository.findByTitleContainingIgnoreCase(title).stream()
+      return categoryRepository
+          .findByStatusAndTitleContainingIgnoreCase(CategoryStatus.ACTIVE, title)
+          .stream()
           .map(CategoryMapper::toDto)
           .toList();
     }
@@ -77,7 +82,7 @@ public class CategoryService {
   public CategoryDTO findById(Long categoryId) {
     Category existingCategory =
         categoryRepository
-            .findById(categoryId)
+            .findByIdAndStatus(categoryId, CategoryStatus.ACTIVE)
             .orElseThrow(
                 () ->
                     new CategoryNotFoundException(
@@ -133,11 +138,11 @@ public class CategoryService {
             .findById(categoryId)
             .orElseThrow(() -> new CategoryNotFoundException("Категория не найдена"));
 
-    if (existingCategory.getImageId() != null) {
-      minioTemplate.deleteFile(existingCategory.getImageId());
+    if (existingCategory.getImageUUID() != null) {
+      minioTemplate.deleteFile(existingCategory.getImageUUID().toString());
     }
 
-    categoryRepository.delete(existingCategory);
+    categoryRepository.delete(existingCategory.getId());
   }
 
   /**
@@ -154,13 +159,11 @@ public class CategoryService {
             .findById(categoryId)
             .orElseThrow(() -> new CategoryNotFoundException("Категория не найдена"));
 
-    if (category.getImageId() != null) {
-      minioTemplate.deleteFile(category.getImageId());
+    if (category.getImageUUID() != null) {
+      minioTemplate.deleteFile(category.getImageUUID().toString());
     }
 
-    String fileName = minioTemplate.uploadFile(file);
-
-    category.setImageId(fileName);
+    category.setImageUUID(minioTemplate.uploadFile(file));
     return CategoryMapper.toDto(categoryRepository.save(category));
   }
 
@@ -173,7 +176,7 @@ public class CategoryService {
   private void copyToEntity(Category entity, CategoryDTO dto) {
     entity.setTitle(dto.getTitle());
     entity.setBasePrice(dto.getBasePrice());
-    entity.setImageId(dto.getImageId());
+    entity.setImageUUID(dto.getImageUUID());
     entity.setDescription(dto.getDescription());
     entity.setShortDescription(dto.getShortDescription());
     entity.setStatus(dto.getStatus());

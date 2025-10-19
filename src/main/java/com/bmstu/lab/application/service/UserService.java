@@ -30,7 +30,7 @@ public class UserService {
       throw new DuplicateUsernameException("Пользователь с таким именем уже существует");
     }
 
-    User user = UserMapper.fromAuthenticationDto(dto);
+    User user = UserMapper.toEntity(dto);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     return UserMapper.toDto(userRepository.save(user));
   }

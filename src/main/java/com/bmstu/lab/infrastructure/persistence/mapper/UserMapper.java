@@ -10,7 +10,7 @@ public class UserMapper {
     return new UserDTO(user.getId(), user.getUsername(), user.isModerator());
   }
 
-  public static User fromAuthenticationDto(UserCredentialsDTO dto) {
+  public static User toEntity(UserCredentialsDTO dto) {
     User user = new User();
     user.setUsername(dto.getUsername());
     user.setPassword(dto.getPassword());

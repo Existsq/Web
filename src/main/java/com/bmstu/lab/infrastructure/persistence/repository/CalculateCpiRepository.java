@@ -19,7 +19,7 @@ public interface CalculateCpiRepository extends JpaRepository<CalculateCpi, Long
   @Transactional
   @Query("UPDATE CalculateCpi o SET o.status = 'DELETED' WHERE o.id = :calculateCpiId")
   void deleteCalculateCpi(@Param("calculateCpiId") Long calculateCpiId);
-
+  
   Optional<CalculateCpi> findFirstByStatusAndCreatorId(CalculateCpiStatus status, Long creatorId);
 
   List<CalculateCpi> findByFormedAtBetweenAndStatus(
@@ -28,4 +28,6 @@ public interface CalculateCpiRepository extends JpaRepository<CalculateCpi, Long
   List<CalculateCpi> findByFormedAtBetween(LocalDateTime from, LocalDateTime to);
 
   List<CalculateCpi> findByStatus(CalculateCpiStatus status);
+
+  Optional<CalculateCpi> findFirstByCreatorId(Long creatorId);
 }

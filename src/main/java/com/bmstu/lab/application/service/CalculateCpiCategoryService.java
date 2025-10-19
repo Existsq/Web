@@ -1,10 +1,11 @@
 package com.bmstu.lab.application.service;
 
+import com.bmstu.lab.application.exception.CalculateCpiCategoryNotFoundException;
+import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategoryId;
-import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiCategoryRepository;
-import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.Category;
+import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiCategoryRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class CalculateCpiCategoryService {
     CalculateCpiCategory entity =
         calculateCpiCategoryRepository
             .findById(new CalculateCpiCategoryId(cpi.getId(), category.getId()))
-            .orElseThrow(() -> new RuntimeException("Запись не найдена"));
+            .orElseThrow(() -> new CalculateCpiCategoryNotFoundException("Запись не найдена"));
 
     if (userSpent != null) entity.setUserSpent(userSpent);
 

@@ -1,7 +1,7 @@
 package com.bmstu.lab.presentation.controller;
 
-import com.bmstu.lab.application.service.CalculateCpiService;
 import com.bmstu.lab.application.dto.CategoryDTO;
+import com.bmstu.lab.application.service.CalculateCpiService;
 import com.bmstu.lab.application.service.CategoryService;
 import java.util.List;
 import lombok.AllArgsConstructor;
