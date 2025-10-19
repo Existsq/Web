@@ -21,14 +21,12 @@ public class CategoryDTO {
 
   private double basePrice;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String imageId;
 
   private String description;
 
   private String shortDescription;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Double coefficient;
 
   private CategoryStatus status = ACTIVE;

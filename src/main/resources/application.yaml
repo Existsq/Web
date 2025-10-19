@@ -15,6 +15,8 @@ spring:
       mode: always
   jackson:
     time-zone: Europe/Moscow
+  main:
+    banner-mode: off
 server:
   port: 8080
 
@@ -25,3 +27,6 @@ minio:
     secret: minio124
     access: minio
   bucket.name: images
+logging:
+  level:
+    root: error

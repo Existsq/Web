@@ -2,6 +2,7 @@ package com.bmstu.lab.calculate.cpi.service;
 
 import com.bmstu.lab.calculate.cpi.category.model.entity.CalculateCpiCategory;
 import com.bmstu.lab.calculate.cpi.category.service.CalculateCpiCategoryService;
+import com.bmstu.lab.calculate.cpi.exception.DeletedDraftException;
 import com.bmstu.lab.calculate.cpi.exception.DraftNotFoundException;
 import com.bmstu.lab.calculate.cpi.exception.InvalidDraftException;
 import com.bmstu.lab.calculate.cpi.exception.UnauthorizedDraftAccessException;
@@ -111,7 +112,7 @@ public class CalculateCpiService {
   public DraftInfoDTO getDraftInfo(Long userId) {
     CalculateCpi draft = getDraft(userId);
     if (draft == null) {
-      throw new DraftNotFoundException("Черновик не найден");
+      return new DraftInfoDTO(null, 0);
     }
     return new DraftInfoDTO(draft.getId(), draft.getPositions());
   }
@@ -155,6 +156,10 @@ public class CalculateCpiService {
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new RuntimeException("Заявка не найдена"));
+
+    if (cpi.getStatus().equals(CalculateCpiStatus.DELETED)) {
+      throw new DeletedDraftException("Попытка получения удаленной заявки");
+    }
 
     List<CalculateCpiCategory> calculateCpiCategories =
         calculateCpiCategoryService.findByCalculateCpi(cpi);

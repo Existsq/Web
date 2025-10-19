@@ -1,5 +1,6 @@
 package com.bmstu.lab.exception;
 
+import com.bmstu.lab.calculate.cpi.exception.DeletedDraftException;
 import com.bmstu.lab.calculate.cpi.exception.DraftNotFoundException;
 import com.bmstu.lab.calculate.cpi.exception.InvalidDraftException;
 import com.bmstu.lab.calculate.cpi.exception.UnauthorizedDraftAccessException;
@@ -68,7 +69,7 @@ public class GlobalAdviceController {
         .path(request.getRequestURI())
         .build();
   }
-
+  
   @ExceptionHandler(DraftNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ErrorResponse handleDraftNotFound(DraftNotFoundException e, HttpServletRequest request) {
@@ -157,6 +158,13 @@ public class GlobalAdviceController {
         .message(e.getMessage())
         .path(request.getRequestURI())
         .build();
+  }
+
+  @ExceptionHandler(DeletedDraftException.class)
+  public ResponseEntity<Void> handleDeletedDraft(DeletedDraftException ex) {
+    log.error("Получение удаленной заявки: {}", ex.getMessage(), ex);
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @ExceptionHandler(Exception.class)
