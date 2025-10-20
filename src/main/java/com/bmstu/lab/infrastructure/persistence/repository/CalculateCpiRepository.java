@@ -17,10 +17,12 @@ public interface CalculateCpiRepository extends JpaRepository<CalculateCpi, Long
 
   @Modifying
   @Transactional
-  @Query("UPDATE CalculateCpi o SET o.status = 'DELETED' WHERE o.id = :calculateCpiId")
+  @Query(
+      "UPDATE CalculateCpi o SET o.status = com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus.DELETED WHERE o.id = :calculateCpiId")
   void deleteCalculateCpi(@Param("calculateCpiId") Long calculateCpiId);
-  
-  Optional<CalculateCpi> findFirstByStatusAndCreatorId(CalculateCpiStatus status, Long creatorId);
+
+  Optional<CalculateCpi> findFirstByStatusAndCreatorUsername(
+      CalculateCpiStatus status, String creatorUsername);
 
   List<CalculateCpi> findByFormedAtBetweenAndStatus(
       LocalDateTime from, LocalDateTime to, CalculateCpiStatus status);

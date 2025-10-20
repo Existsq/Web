@@ -29,4 +29,13 @@ minio:
   bucket.name: categories
 logging:
   level:
-    root: error
+    root: info
+    com:
+      bmstu:
+        lab: trace
+
+jwt:
+  secret: vcNreNuHt307dFou/OD1Uc3w97+sLcJpi0nBsWbNK5czapXowy++EDOBbJ6AVBj1e+CxDL4d2M8YZlV5KNu2UA==
+  expiration-ms: 86400000
+  cookie.key: "jwt_token"
+  blacklist.ttl-hours: 2

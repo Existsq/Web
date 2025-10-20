@@ -36,7 +36,9 @@ public class CalculateCpiMapper {
             .filter(
                 calculateCpiCategory ->
                     calculateCpiCategory.getCategory().getStatus().equals(CategoryStatus.ACTIVE))
-            .map(calculateCpiCategory -> CategoryMapper.toDto(calculateCpiCategory.getCategory()))
+            .map(
+                calculateCpiCategory ->
+                    CategoryMapper.toDto(calculateCpiCategory.getCategory(), calculateCpiCategory))
             .toList());
   }
 }

@@ -10,6 +10,8 @@ import com.bmstu.lab.infrastructure.persistence.entity.Category;
 import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiCategoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,11 +29,14 @@ public class CalculateCpiCategoryController {
   private final CategoryService categoryService;
 
   @DeleteMapping("/{cpiId}/category/{categoryId}")
-  public ResponseEntity<Void> delete(@PathVariable Long cpiId, @PathVariable Long categoryId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable Long cpiId,
+      @PathVariable Long categoryId,
+      @AuthenticationPrincipal UserDetails userDetails) {
     CalculateCpi cpi = calculateCpiService.getByIdEntity(cpiId);
     Category category = categoryService.findByIdEntity(categoryId);
 
-    calculateCpiCategoryService.delete(cpi, category);
+    calculateCpiCategoryService.delete(cpi, category, userDetails.getUsername());
     return ResponseEntity.noContent().build();
   }
 
@@ -39,13 +44,15 @@ public class CalculateCpiCategoryController {
   public ResponseEntity<CalculateCpiCategoryDTO> update(
       @PathVariable Long cpiId,
       @PathVariable Long categoryId,
-      @RequestBody CalculateCpiCategoryDTO dto) {
+      @RequestBody CalculateCpiCategoryDTO dto,
+      @AuthenticationPrincipal UserDetails userDetails) {
 
     CalculateCpi cpi = calculateCpiService.getByIdEntity(cpiId);
     Category category = categoryService.findByIdEntity(categoryId);
 
     CalculateCpiCategory updated =
-        calculateCpiCategoryService.update(cpi, category, dto.getUserSpent());
+        calculateCpiCategoryService.update(
+            cpi, category, dto.getUserSpent(), userDetails.getUsername());
 
     calculateCpiService.recalcDraft(cpi);
 

@@ -27,5 +27,5 @@ public class CalculateCpiCategory {
 
   private double coefficient;
 
-  private Double userSpent;
+  private double userSpent;
 }

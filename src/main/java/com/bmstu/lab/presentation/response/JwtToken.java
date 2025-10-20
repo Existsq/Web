@@ -1,14 +1,3 @@
 package com.bmstu.lab.presentation.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class JwtToken {
-  private String token;
-}
+public record JwtToken(String value) {}

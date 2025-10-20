@@ -48,13 +48,13 @@ public class CategoryService {
   public List<CategoryDTO> findAll(String title) {
     if (title == null) {
       return categoryRepository.findAllByStatus(CategoryStatus.ACTIVE).stream()
-          .map(CategoryMapper::toDto)
+          .map(category -> CategoryMapper.toDto(category, null))
           .toList();
     } else {
       return categoryRepository
           .findByStatusAndTitleContainingIgnoreCase(CategoryStatus.ACTIVE, title)
           .stream()
-          .map(CategoryMapper::toDto)
+          .map(category -> CategoryMapper.toDto(category, null))
           .toList();
     }
   }
@@ -87,7 +87,7 @@ public class CategoryService {
                 () ->
                     new CategoryNotFoundException(
                         "Категория с id = " + categoryId + " не найдена"));
-    return CategoryMapper.toDto(existingCategory);
+    return CategoryMapper.toDto(existingCategory, null);
   }
 
   /**
@@ -104,7 +104,7 @@ public class CategoryService {
     }
 
     Category category = CategoryMapper.toEntity(categoryDTO);
-    return CategoryMapper.toDto(categoryRepository.save(category));
+    return CategoryMapper.toDto(categoryRepository.save(category), null);
   }
 
   /**
@@ -123,7 +123,7 @@ public class CategoryService {
 
     copyToEntity(existingCategory, categoryDTO);
 
-    return CategoryMapper.toDto(categoryRepository.save(existingCategory));
+    return CategoryMapper.toDto(categoryRepository.save(existingCategory), null);
   }
 
   /**
@@ -164,7 +164,7 @@ public class CategoryService {
     }
 
     category.setImageUUID(minioTemplate.uploadFile(file));
-    return CategoryMapper.toDto(categoryRepository.save(category));
+    return CategoryMapper.toDto(categoryRepository.save(category), null);
   }
 
   /**

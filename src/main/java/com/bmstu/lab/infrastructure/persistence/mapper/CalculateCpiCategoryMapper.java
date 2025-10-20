@@ -10,7 +10,7 @@ public class CalculateCpiCategoryMapper {
   public static CalculateCpiCategoryDTO toDto(CalculateCpiCategory entity) {
     return new CalculateCpiCategoryDTO(
         CalculateCpiMapper.toDto(entity.getCalculateCpi()),
-        CategoryMapper.toDto(entity.getCategory()),
+        CategoryMapper.toDto(entity.getCategory(), null),
         entity.getUserSpent(),
         entity.getCoefficient());
   }

@@ -29,5 +29,7 @@ public class CategoryDTO {
 
   private Double coefficient;
 
+  private Double userSpent;
+
   private CategoryStatus status = ACTIVE;
 }

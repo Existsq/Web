@@ -6,6 +6,9 @@ import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,43 +26,53 @@ public class CalculateCpiController {
   private final CalculateCpiService calculateCpiService;
 
   @GetMapping("/draft-info")
-  public CalculateCpiService.DraftInfoDTO getDraftInfo() {
-    Long userId = 1L;
-    return calculateCpiService.getDraftInfo(userId);
+  public CalculateCpiService.DraftInfoDTO getDraftInfo(
+      @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.getDraftInfoByUsername(userDetails.getUsername());
   }
 
   @GetMapping
   public List<CalculateCpiDTO> getAll(
       @RequestParam(required = false) LocalDate from,
       @RequestParam(required = false) LocalDate to,
-      @RequestParam(required = false) CalculateCpiStatus status) {
-
-    return calculateCpiService.findAllFiltered(from, to, status);
+      @RequestParam(required = false) CalculateCpiStatus status,
+      @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.findAllFiltered(from, to, status, userDetails.getUsername());
   }
 
   @GetMapping("/{id}")
-  public CalculateCpiDTO getById(@PathVariable Long id) {
-    return calculateCpiService.getById(id);
+  public CalculateCpiDTO getById(
+      @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.getById(id, userDetails.getUsername());
   }
 
   @PutMapping("/{id}")
-  public CalculateCpiDTO update(@PathVariable Long id, @RequestBody CalculateCpiDTO dto) {
-    return calculateCpiService.update(id, dto);
+  public CalculateCpiDTO update(
+      @PathVariable Long id,
+      @RequestBody CalculateCpiDTO dto,
+      @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.update(id, dto, userDetails.getUsername());
   }
 
+  // Сформировать создателем
   @PutMapping("/form/{draftId}")
-  public CalculateCpiDTO formDraft(@PathVariable Long draftId) {
-    Long userId = 1L;
-    return calculateCpiService.formDraft(userId, draftId);
+  public CalculateCpiDTO formDraft(
+      @PathVariable Long draftId, @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.formDraft(userDetails.getUsername(), draftId);
   }
 
-  @PutMapping("/deny/{id}")
-  public CalculateCpiDTO deny(@PathVariable Long id, @RequestParam boolean approve) {
-    return calculateCpiService.denyOrComplete(id, 1L, approve);
+  // Завершить/отклонить модератором
+  @PutMapping("/deny-complete/{id}")
+  @PreAuthorize("hasAuthority('ROLE_MODERATOR')")
+  public CalculateCpiDTO denyOrComplete(
+      @PathVariable Long id,
+      @RequestParam boolean approve,
+      @AuthenticationPrincipal UserDetails userDetails) {
+    return calculateCpiService.denyOrComplete(id, userDetails.getUsername(), approve);
   }
 
   @DeleteMapping("/{draftId}")
-  public void delete(@PathVariable Long draftId) {
-    calculateCpiService.delete(draftId, 1L);
+  public void delete(@PathVariable Long draftId, @AuthenticationPrincipal UserDetails userDetails) {
+    calculateCpiService.delete(draftId, userDetails.getUsername());
   }
 }

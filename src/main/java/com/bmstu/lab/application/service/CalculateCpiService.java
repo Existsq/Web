@@ -9,7 +9,6 @@ import com.bmstu.lab.application.exception.DraftNotFoundException;
 import com.bmstu.lab.application.exception.InvalidDraftException;
 import com.bmstu.lab.application.exception.InvalidStatusChangeException;
 import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
-import com.bmstu.lab.application.exception.UserNotFoundException;
 import com.bmstu.lab.application.usecase.CpiCalculator;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
@@ -20,7 +19,6 @@ import com.bmstu.lab.infrastructure.persistence.enums.CategoryStatus;
 import com.bmstu.lab.infrastructure.persistence.mapper.CalculateCpiMapper;
 import com.bmstu.lab.infrastructure.persistence.mapper.CategoryMapper;
 import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiRepository;
-import com.bmstu.lab.infrastructure.persistence.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -37,28 +35,29 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CalculateCpiService {
 
-  private final CalculateCpiRepository calculateCpiRepository;
   private final UserService userService;
   private final CpiCalculator cpiCalculator;
   private final CategoryService categoryService;
   private final CalculateCpiCategoryService calculateCpiCategoryService;
-  private final UserRepository userRepository;
 
-  public CategoryDTO addCategoryToDraft(Long userId, Long categoryId) {
+  private final CalculateCpiRepository calculateCpiRepository;
+
+  public CategoryDTO addCategoryToDraft(String username, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
 
     if (category.getStatus().equals(CategoryStatus.DELETED)) {
       throw new CategoryNotFoundException("Категории не найдено");
     }
 
-    CalculateCpi draft = getOrCreateDraft(userId);
+    CalculateCpi draft = getOrCreateDraft(username);
 
     boolean alreadyExists =
         calculateCpiCategoryService.findByCalculateCpi(draft).stream()
             .anyMatch(cpiCat -> cpiCat.getCategory().getId().equals(category.getId()));
 
+    CalculateCpiCategory newEntry = null;
     if (!alreadyExists) {
-      CalculateCpiCategory newEntry = new CalculateCpiCategory();
+      newEntry = new CalculateCpiCategory();
       newEntry.setCalculateCpi(draft);
       newEntry.setCategory(category);
       newEntry.setUserSpent(category.getBasePrice());
@@ -66,48 +65,37 @@ public class CalculateCpiService {
     }
 
     recalcDraft(draft);
-    return CategoryMapper.toDto(category);
+    return CategoryMapper.toDto(category, newEntry);
   }
 
   public void recalcDraft(CalculateCpi draft) {
-    //    double personalCPI =
-    //        cpiCalculator.calculatePersonalCPI(
-    //            draft.getCalculateCpiCategories(), draft.getComparisonDate());
-    //    draft.setPersonalCPI(personalCPI);
+    List<CalculateCpiCategory> categories = calculateCpiCategoryService.findByCalculateCpi(draft);
 
-    double totalSpent =
-        draft.getCalculateCpiCategories().stream()
-            .mapToDouble(CalculateCpiCategory::getUserSpent)
-            .sum();
+    double totalSpent = categories.stream().mapToDouble(CalculateCpiCategory::getUserSpent).sum();
 
     List<CalculateCpiCategory> updatedCategories =
-        cpiCalculator.mapToCategoriesWithCoefficient(draft.getCalculateCpiCategories(), totalSpent);
+        cpiCalculator.mapToCategoriesWithCoefficient(categories, totalSpent);
+
     calculateCpiCategoryService.saveAll(updatedCategories);
-    draft.setPositions(draft.getCalculateCpiCategories().size());
+    draft.setPositions(categories.size());
 
     calculateCpiRepository.save(draft);
   }
 
-  public CalculateCpi getOrCreateDraft(Long userId) {
+  public CalculateCpi getOrCreateDraft(String username) {
     return calculateCpiRepository
-        .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
-        .orElseGet(() -> createDraft(userId));
+        .findFirstByStatusAndCreatorUsername(CalculateCpiStatus.DRAFT, username)
+        .orElseGet(() -> createDraft(username));
   }
 
-  public CalculateCpi getDraft(Long userId) {
+  public CalculateCpi getDraft(String username) {
     return calculateCpiRepository
-        .findFirstByStatusAndCreatorId(CalculateCpiStatus.DRAFT, userId)
+        .findFirstByStatusAndCreatorUsername(CalculateCpiStatus.DRAFT, username)
         .orElse(null);
   }
 
-  public void deleteDraft(Long userId) {
-    calculateCpiRepository
-        .findFirstByCreatorId(userId)
-        .ifPresent(draft -> calculateCpiRepository.deleteCalculateCpi(draft.getId()));
-  }
-
-  private CalculateCpi createDraft(Long userId) {
-    var user = userService.getById(userId);
+  private CalculateCpi createDraft(String username) {
+    User user = userService.findByUsername(username);
     CalculateCpi draft = new CalculateCpi();
     draft.setStatus(CalculateCpiStatus.DRAFT);
     draft.setCreator(user);
@@ -115,8 +103,9 @@ public class CalculateCpiService {
     return calculateCpiRepository.save(draft);
   }
 
-  public DraftInfoDTO getDraftInfo(Long userId) {
-    CalculateCpi draft = getDraft(userId);
+  public DraftInfoDTO getDraftInfoByUsername(String username) {
+    CalculateCpi draft = getDraft(username);
+
     if (draft == null) {
       return new DraftInfoDTO(null, 0);
     }
@@ -124,20 +113,17 @@ public class CalculateCpiService {
   }
 
   public List<CalculateCpiDTO> findAllFiltered(
-      LocalDate from, LocalDate to, CalculateCpiStatus status) {
+      LocalDate from, LocalDate to, CalculateCpiStatus status, String username) {
 
     List<CalculateCpi> list;
 
     Predicate<CalculateCpiStatus> checkStatus =
-        (status1) ->
-            status1.equals(CalculateCpiStatus.DRAFT) || status.equals(CalculateCpiStatus.DELETED);
+        s -> s.equals(CalculateCpiStatus.DRAFT) || s.equals(CalculateCpiStatus.DELETED);
 
     if (from == null && to == null && status == null) {
       list = calculateCpiRepository.findAll();
     } else if (from != null && to != null && status != null) {
-      if (checkStatus.test(status)) {
-        return List.of();
-      }
+      if (checkStatus.test(status)) return List.of();
       list =
           calculateCpiRepository.findByFormedAtBetweenAndStatus(
               LocalDateTime.of(from, LocalTime.MIN), LocalDateTime.of(to, LocalTime.MAX), status);
@@ -146,22 +132,40 @@ public class CalculateCpiService {
           calculateCpiRepository.findByFormedAtBetween(
               LocalDateTime.of(from, LocalTime.MIN), LocalDateTime.of(to, LocalTime.MAX));
     } else if (status != null) {
-      if (checkStatus.test(status)) {
-        return List.of();
-      }
+      if (checkStatus.test(status)) return List.of();
       list = calculateCpiRepository.findByStatus(status);
     } else {
       list = calculateCpiRepository.findAll();
     }
 
-    return list.stream().map(CalculateCpiMapper::toDto).collect(Collectors.toList());
+    if (username != null) {
+      User existingUser = userService.findByUsername(username);
+
+      if (!existingUser.isModerator()) {
+        list =
+            list.stream()
+                .filter(
+                    cpi ->
+                        cpi.getCreator() != null && username.equals(cpi.getCreator().getUsername()))
+                .collect(Collectors.toList());
+      }
+    }
+
+    return list.stream()
+        .filter(calculateCpi -> !calculateCpi.getStatus().equals(CalculateCpiStatus.DELETED))
+        .map(CalculateCpiMapper::toDto)
+        .collect(Collectors.toList());
   }
 
-  public CalculateCpiDTO getById(Long id) {
+  public CalculateCpiDTO getById(Long id, String username) {
     CalculateCpi cpi =
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
+
+    if (!cpi.getCreator().getUsername().equals(username) && !cpi.getCreator().isModerator()) {
+      throw new AccessDeniedException("Вы не можете получить эту заявку");
+    }
 
     if (cpi.getStatus().equals(CalculateCpiStatus.DELETED)) {
       throw new DeletedDraftException("Попытка получения удаленной заявки");
@@ -172,16 +176,13 @@ public class CalculateCpiService {
     return CalculateCpiMapper.toDtoWithCategories(cpi, calculateCpiCategories);
   }
 
-  public CalculateCpiDTO update(Long id, CalculateCpiDTO dto) {
+  public CalculateCpiDTO update(Long id, CalculateCpiDTO dto, String username) {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
 
-    User currentUser =
-        userRepository
-            .findById(1L)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+    User currentUser = userService.findByUsername(username);
 
     if (!currentUser.equals(draft.getCreator()) && !currentUser.isModerator()) {
       throw new UnauthorizedDraftAccessException("Вы не можете обновлять данную заявку");
@@ -216,19 +217,19 @@ public class CalculateCpiService {
     }
   }
 
-  public CalculateCpiDTO formDraft(Long userId, Long draftId) {
+  public CalculateCpiDTO formDraft(String username, Long draftId) {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(draftId)
             .orElseThrow(() -> new DraftNotFoundException("Черновик не найден"));
 
-    if (!draft.getCreator().getId().equals(userId)) {
+    if (!draft.getCreator().getUsername().equals(username)) {
       throw new UnauthorizedDraftAccessException("Нельзя формировать чужой черновик");
     }
 
-    if (draft.getCalculateCpiCategories().isEmpty()) {
-      throw new InvalidDraftException("Нельзя сформировать пустую заявку");
-    }
+    List<CalculateCpiCategory> categories = calculateCpiCategoryService.findByCalculateCpi(draft);
+    if (categories.isEmpty()) throw new InvalidDraftException("Нельзя сформировать пустую заявку");
+    draft.setCalculateCpiCategories(categories);
 
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
@@ -240,7 +241,7 @@ public class CalculateCpiService {
     return CalculateCpiMapper.toDtoWithCategories(draft, draft.getCalculateCpiCategories());
   }
 
-  public CalculateCpiDTO denyOrComplete(Long id, Long moderatorId, boolean approve) {
+  public CalculateCpiDTO denyOrComplete(Long id, String username, boolean approve) {
     CalculateCpi cpi =
         calculateCpiRepository
             .findById(id)
@@ -251,7 +252,7 @@ public class CalculateCpiService {
             cpi.getCalculateCpiCategories(), cpi.getComparisonDate());
     cpi.setPersonalCPI(personalCPI);
 
-    User moderator = userService.getById(moderatorId);
+    User moderator = userService.findByUsername(username);
 
     if (!moderator.isModerator()) {
       throw new AccessDeniedException("Пользователь не имеет прав модератора");
@@ -272,20 +273,20 @@ public class CalculateCpiService {
         savedCalculateCpi, savedCalculateCpi.getCalculateCpiCategories());
   }
 
-  public void delete(Long draftId, Long userId) {
+  public void delete(Long draftId, String username) {
     CalculateCpi draft =
         calculateCpiRepository
             .findById(draftId)
             .orElseThrow(() -> new CalculateCpiNotFoundException("Расчёт не найден"));
 
-    boolean isOwner = draft.getCreator().getId().equals(userId);
-    boolean isModerator = draft.getCreator().isModerator();
+    boolean isOwner = draft.getCreator().getUsername().equals(username);
+    boolean isModerator = userService.findByUsername(username).isModerator();
 
     if (!isOwner && !isModerator) {
       throw new UnauthorizedDraftAccessException("Нельзя удалить чужую заявку");
     }
 
-    this.deleteDraft(draft.getId());
+    calculateCpiRepository.deleteCalculateCpi(draft.getId());
   }
 
   public CalculateCpi getByIdEntity(Long cpiId) {
