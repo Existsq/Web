@@ -5,6 +5,7 @@ import com.bmstu.lab.infrastructure.security.filter.JwtAuthenticationFilter;
 import com.bmstu.lab.infrastructure.security.filter.JwtBlacklistFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,7 +28,14 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/users/login", "/api/users/register")
+                auth.requestMatchers(
+                        "/api/users/login",
+                        "/api/categories",
+                        "/api/users/register",
+                        "/swagger-ui/**",
+                        "v3/api-docs/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/categories/*")
                     .permitAll()
                     .requestMatchers("/error", "/")
                     .permitAll()

@@ -19,22 +19,12 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
 
   public UserDTO getCurrentUser(String username) {
-    User user =
-        userRepository
-            .findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+    User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     return UserMapper.toDto(user);
   }
 
-  public UserDTO save(User user) {
-    return UserMapper.toDto(userRepository.save(user));
-  }
-
   public UserDTO updateUser(String username, UserCredentialsDTO dto) {
-    User user =
-        userRepository
-            .findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+    User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     if (dto.getUsername() != null && !dto.getUsername().equals(user.getUsername())) {
       userRepository
@@ -53,15 +43,7 @@ public class UserService {
     return UserMapper.toDto(userRepository.save(user));
   }
 
-  public User findById(Long userId) {
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-  }
-
   public User findByUsername(String username) {
-    return userRepository
-        .findByUsername(username)
-        .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+    return userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
   }
 }
