@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/calculate-cpi-categories")
 @RequiredArgsConstructor
 @Tag(name = "CPI Categories", description = "API для управления категориями внутри расчета CPI")
-@SecurityRequirement(name = "jwtAuth") // Требует JWT авторизацию
+@SecurityRequirement(name = "jwtAuth")
 public class CalculateCpiCategoryController {
 
   private final CalculateCpiCategoryService calculateCpiCategoryService;

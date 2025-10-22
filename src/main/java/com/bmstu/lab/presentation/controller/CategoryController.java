@@ -68,10 +68,10 @@ public class CategoryController {
   @ApiResponse(responseCode = "401", description = "Пользователь не аутентифицирован")
   @SecurityRequirement(name = "jwtAuth")
   @PostMapping("/{categoryId}/draft")
-  public CategoryDTO addCategoryToDraft(
+  public void addCategoryToDraft(
       @Parameter(description = "ID категории", example = "1") @PathVariable Long categoryId,
       @AuthenticationPrincipal UserDetails userDetails) {
-    return calculateCpiService.addCategoryToDraft(userDetails.getUsername(), categoryId);
+    calculateCpiService.addCategoryToDraft(userDetails.getUsername(), categoryId);
   }
 
   @Operation(
