@@ -1,5 +1,6 @@
 package com.bmstu.lab.application.service;
 
+import com.bmstu.lab.application.dto.AsyncResultDTO;
 import com.bmstu.lab.application.dto.CalculateCpiDTO;
 import com.bmstu.lab.application.dto.CategoryDTO;
 import com.bmstu.lab.application.exception.CalculateCpiNotFoundException;
@@ -10,6 +11,7 @@ import com.bmstu.lab.application.exception.InvalidDraftException;
 import com.bmstu.lab.application.exception.InvalidStatusChangeException;
 import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
 import com.bmstu.lab.application.usecase.CpiCalculator;
+import com.bmstu.lab.infrastructure.config.AsyncServiceConfig;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpi;
 import com.bmstu.lab.infrastructure.persistence.entity.CalculateCpiCategory;
 import com.bmstu.lab.infrastructure.persistence.entity.Category;
@@ -23,12 +25,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CalculateCpiService {
@@ -39,6 +50,8 @@ public class CalculateCpiService {
   private final CalculateCpiCategoryService calculateCpiCategoryService;
 
   private final CalculateCpiRepository calculateCpiRepository;
+  private final RestTemplate restTemplate;
+  private final AsyncServiceConfig asyncServiceConfig;
 
   public CategoryDTO addCategoryToDraft(String username, Long categoryId) {
     Category category = categoryService.findByIdEntity(categoryId);
@@ -144,12 +157,19 @@ public class CalculateCpiService {
                 .filter(
                     cpi ->
                         cpi.getCreator() != null && username.equals(cpi.getCreator().getUsername()))
+                .filter(
+                    cpi ->
+                        !cpi.getStatus().equals(CalculateCpiStatus.DELETED)
+                            && !cpi.getStatus().equals(CalculateCpiStatus.DRAFT))
                 .toList();
       }
     }
 
     return list.stream()
-        .filter(cpi -> cpi.getStatus() != CalculateCpiStatus.DELETED)
+        .filter(
+            cpi ->
+                !cpi.getStatus().equals(CalculateCpiStatus.DELETED)
+                    && !cpi.getStatus().equals(CalculateCpiStatus.DRAFT))
         .map(
             cpi ->
                 CalculateCpiMapper.toDtoWithCategories(
@@ -163,9 +183,26 @@ public class CalculateCpiService {
             .findById(id)
             .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
 
-    if (!cpi.getCreator().getUsername().equals(username) && !cpi.getCreator().isModerator()) {
+    User existingUser = userService.findByUsername(username);
+
+    if (!cpi.getCreator().getUsername().equals(username) && !existingUser.isModerator()) {
       throw new AccessDeniedException("Вы не можете получить эту заявку");
     }
+
+    if (cpi.getStatus().equals(CalculateCpiStatus.DELETED)) {
+      throw new DeletedDraftException("Попытка получения удаленной заявки");
+    }
+
+    List<CalculateCpiCategory> calculateCpiCategories =
+        calculateCpiCategoryService.findByCalculateCpi(cpi);
+    return CalculateCpiMapper.toDtoWithCategories(cpi, calculateCpiCategories);
+  }
+
+  public CalculateCpiDTO getByIdForAsyncService(Long id) {
+    CalculateCpi cpi =
+        calculateCpiRepository
+            .findById(id)
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
 
     if (cpi.getStatus().equals(CalculateCpiStatus.DELETED)) {
       throw new DeletedDraftException("Попытка получения удаленной заявки");
@@ -231,16 +268,18 @@ public class CalculateCpiService {
 
     List<CalculateCpiCategory> categories = calculateCpiCategoryService.findByCalculateCpi(draft);
     if (categories.isEmpty()) throw new InvalidDraftException("Нельзя сформировать пустую заявку");
-    draft.setCalculateCpiCategories(categories);
-
+    
+    // Синхронный расчет coefficient для м-м связи
+    recalcDraft(draft);
+    
     draft.setFormedAt(LocalDateTime.now(ZoneId.of("Europe/Moscow")));
     draft.setStatus(CalculateCpiStatus.FORMED);
 
     draft.setCalculateCpiCategories(calculateCpiCategoryService.findByCalculateCpi(draft));
 
-    calculateCpiRepository.save(draft);
+    CalculateCpi savedDraft = calculateCpiRepository.save(draft);
 
-    return CalculateCpiMapper.toDtoWithCategories(draft, draft.getCalculateCpiCategories());
+    return CalculateCpiMapper.toDtoWithCategories(savedDraft, savedDraft.getCalculateCpiCategories());
   }
 
   public CalculateCpiDTO denyOrComplete(Long id, String username, boolean approve) {
@@ -248,11 +287,6 @@ public class CalculateCpiService {
         calculateCpiRepository
             .findById(id)
             .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найдена"));
-
-    double personalCPI =
-        cpiCalculator.calculatePersonalCPI(
-            cpi.getCalculateCpiCategories(), cpi.getComparisonDate());
-    cpi.setPersonalCPI(personalCPI);
 
     User moderator = userService.findByUsername(username);
 
@@ -265,6 +299,29 @@ public class CalculateCpiService {
     cpi.setStatus(approve ? CalculateCpiStatus.COMPLETED : CalculateCpiStatus.REJECTED);
 
     CalculateCpi savedCalculateCpi = calculateCpiRepository.save(cpi);
+
+    // Если заявка подтверждена, вызываем асинхронный сервис для расчета personalCPI
+    if (approve) {
+      CompletableFuture.runAsync(
+          () -> {
+            try {
+              String asyncServiceUrl = asyncServiceConfig.getUrl();
+              Map<String, Object> payload = new HashMap<>();
+              payload.put("pk", savedCalculateCpi.getId());
+              payload.put("token", asyncServiceConfig.getToken());
+
+              HttpHeaders headers = new HttpHeaders();
+              headers.setContentType(MediaType.APPLICATION_JSON);
+
+              HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+
+              restTemplate.postForObject(asyncServiceUrl, request, String.class);
+              log.info("Async service called for request {} after moderator approval", savedCalculateCpi.getId());
+            } catch (Exception e) {
+              log.error("Failed to call async service for request {}", savedCalculateCpi.getId(), e);
+            }
+          });
+    }
 
     List<CalculateCpiCategory> calculateCpiCategories =
         calculateCpiCategoryService.findByCalculateCpi(savedCalculateCpi);
@@ -293,6 +350,29 @@ public class CalculateCpiService {
 
   public CalculateCpi getByIdEntity(Long cpiId) {
     return calculateCpiRepository.getReferenceById(cpiId);
+  }
+
+  public void updateAsyncResult(Long id, AsyncResultDTO result) {
+    CalculateCpi cpi =
+        calculateCpiRepository
+            .findById(id)
+            .orElseThrow(() -> new CalculateCpiNotFoundException("Рассчет не найден"));
+
+    // Сохраняем результат расчета (успех или неуспех)
+    cpi.setCalculationSuccess(result.getSuccess());
+
+    // Обновляем personalCPI, если расчет был успешным
+    if (Boolean.TRUE.equals(result.getSuccess()) && result.getPersonalCPI() != null) {
+      cpi.setPersonalCPI(result.getPersonalCPI());
+      log.info("Updated personalCPI for request {}: {}", id, result.getPersonalCPI());
+    } else {
+      // Если расчет не удался, personalCPI остается null
+      cpi.setPersonalCPI(null);
+      log.warn("Calculation failed for request {}: success={}, personalCPI={}", 
+          id, result.getSuccess(), result.getPersonalCPI());
+    }
+
+    calculateCpiRepository.save(cpi);
   }
 
   @Getter

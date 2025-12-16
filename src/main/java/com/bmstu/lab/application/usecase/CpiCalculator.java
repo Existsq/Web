@@ -55,11 +55,14 @@ public class CpiCalculator {
     return calculateCpiCategories.stream()
         .peek(
             oc -> {
-              double coefficient = totalSpent > 0 ? oc.getUserSpent() / totalSpent * 100 : 0.0;
-              BigDecimal rounded =
-                  BigDecimal.valueOf(coefficient).setScale(1, RoundingMode.HALF_UP);
-
-              oc.setCoefficient(rounded.doubleValue());
+              if (totalSpent > 0) {
+                double coefficient = oc.getUserSpent() / totalSpent * 100;
+                BigDecimal rounded =
+                    BigDecimal.valueOf(coefficient).setScale(1, RoundingMode.HALF_UP);
+                oc.setCoefficient(rounded.doubleValue());
+              } else {
+                oc.setCoefficient(null);
+              }
             })
         .toList();
   }

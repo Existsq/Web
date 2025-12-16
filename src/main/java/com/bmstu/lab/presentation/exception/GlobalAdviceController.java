@@ -9,9 +9,11 @@ import com.bmstu.lab.application.exception.DuplicateUsernameException;
 import com.bmstu.lab.application.exception.InvalidCredentialsException;
 import com.bmstu.lab.application.exception.InvalidDraftException;
 import com.bmstu.lab.application.exception.UnauthorizedDraftAccessException;
+import com.bmstu.lab.application.exception.UserAlreadyExistsException;
 import com.bmstu.lab.application.exception.UserNotFoundException;
 import com.bmstu.lab.presentation.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -223,6 +226,51 @@ public class GlobalAdviceController {
             .path(request.getRequestURI())
             .build();
 
+    return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(UserPrincipalNotFoundException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleUserPrincipalNotFound(
+      final UserPrincipalNotFoundException e, HttpServletRequest request) {
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+            .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+            .error("Validation Error")
+            .message(e.getMessage())
+            .path(request.getRequestURI())
+            .build();
+    return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
+      final UserAlreadyExistsException e, HttpServletRequest request) {
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+            .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+            .error("Registration error")
+            .message(e.getMessage())
+            .path(request.getRequestURI())
+            .build();
+    return ResponseEntity.badRequest().body(error);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleBadCredentialsException(
+      final BadCredentialsException e, HttpServletRequest request) {
+    ErrorResponse error =
+        ErrorResponse.builder()
+            .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+            .status(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+            .error("Login error")
+            .message(e.getMessage())
+            .path(request.getRequestURI())
+            .build();
     return ResponseEntity.badRequest().body(error);
   }
 }

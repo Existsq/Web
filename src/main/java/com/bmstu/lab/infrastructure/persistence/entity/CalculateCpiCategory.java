@@ -25,7 +25,7 @@ public class CalculateCpiCategory {
   @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
-  private double coefficient;
+  private Double coefficient;
 
   private double userSpent;
 }

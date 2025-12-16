@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CalculateCpiDTO {
 
+  private Long id;
+
   private CalculateCpiStatus status;
 
   private LocalDateTime createdAt;
@@ -25,6 +27,10 @@ public class CalculateCpiDTO {
   private String creatorUsername;
   private String moderatorUsername;
   private Double personalCPI;
+
+  private Boolean calculationSuccess;
+
+  private Integer filledCategoriesCount;
 
   private List<CategoryDTO> categories;
 }

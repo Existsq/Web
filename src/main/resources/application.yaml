@@ -6,9 +6,9 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/labdb
-    username: labuser
-    password: labpass
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASS}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
@@ -21,8 +21,7 @@ server:
   port: 8080
 
 minio:
-
-  endpoint: http://localhost:9000
+  endpoint: ${MINIO_URL}
   key:
     secret: minio124
     access: minio
@@ -39,3 +38,8 @@ jwt:
   expiration-ms: 86400000
   cookie.key: "jwt_token"
   blacklist.ttl-hours: 2
+
+async:
+  service:
+    url: http://localhost:8001/
+    token: lab8token

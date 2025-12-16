@@ -4,12 +4,14 @@ import com.bmstu.lab.application.dto.UserCredentialsDTO;
 import com.bmstu.lab.application.dto.UserDTO;
 import com.bmstu.lab.application.service.AuthService;
 import com.bmstu.lab.application.service.UserService;
+import com.bmstu.lab.infrastructure.persistence.entity.User;
 import com.bmstu.lab.infrastructure.security.jwt.JwtAuthenticationToken;
 import com.bmstu.lab.presentation.response.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -46,11 +48,11 @@ public class UserController {
 
     ResponseCookie cookie =
         ResponseCookie.from("jwt_token", token.value())
-            .httpOnly(true)
+            .httpOnly(false)
             .secure(true)
             .path("/")
             .maxAge(Duration.ofHours(2))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
     return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(token);
@@ -78,11 +80,11 @@ public class UserController {
 
       ResponseCookie deleteCookie =
           ResponseCookie.from("jwt_token", "")
-              .httpOnly(true)
+              .httpOnly(false)
               .secure(true)
               .path("/")
               .maxAge(0)
-              .sameSite("Strict")
+              .sameSite("None")
               .build();
 
       response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
@@ -112,5 +114,13 @@ public class UserController {
   public ResponseEntity<UserDTO> updateUser(
       @AuthenticationPrincipal UserDetails userDetails, @RequestBody UserCredentialsDTO dto) {
     return ResponseEntity.ok(userService.updateUser(userDetails.getUsername(), dto));
+  }
+  @Operation(summary = "Обновить пароль пользователя", description = "Позвояет установить новый пароль пользователю")
+  @ApiResponse(responseCode = "200", description = "Пароль успешно изменен")
+  @PostMapping("/change-password")
+  public ResponseEntity<String> changePassword(String newPassword, @AuthenticationPrincipal(errorOnInvalidType = true) User user)
+      throws UserPrincipalNotFoundException {
+      userService.changePassword(newPassword, user);
+      return ResponseEntity.ok().body("New password set");
   }
 }

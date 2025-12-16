@@ -15,4 +15,6 @@ public interface CalculateCpiCategoryRepository
   List<CalculateCpiCategory> findByCalculateCpi(CalculateCpi calculateCpi);
 
   void deleteByCalculateCpiAndCategory(CalculateCpi calculateCpi, Category category);
+
+  long countByCalculateCpi(CalculateCpi calculateCpi);
 }

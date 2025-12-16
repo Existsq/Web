@@ -1,5 +1,6 @@
 package com.bmstu.lab.presentation.controller;
 
+import com.bmstu.lab.application.dto.AsyncResultDTO;
 import com.bmstu.lab.application.dto.CalculateCpiDTO;
 import com.bmstu.lab.application.service.CalculateCpiService;
 import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
@@ -17,14 +18,18 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/calculate-cpi")
@@ -46,7 +51,10 @@ public class CalculateCpiController {
   @GetMapping("/draft-info")
   public CalculateCpiService.DraftInfoDTO getDraftInfo(
       @AuthenticationPrincipal UserDetails userDetails) {
-    return calculateCpiService.getDraftInfoByUsername(userDetails.getUsername());
+    if (userDetails != null) {
+      return calculateCpiService.getDraftInfoByUsername(userDetails.getUsername());
+    }
+    return calculateCpiService.getDraftInfoByUsername(null);
   }
 
   @Operation(
@@ -58,17 +66,17 @@ public class CalculateCpiController {
   @SecurityRequirement(name = "jwtAuth")
   @GetMapping
   public List<CalculateCpiDTO> getAll(
-      @Parameter(description = "Дата начала периода фильтрации", example = "2025-01-01")
-          @RequestParam(required = false)
-          LocalDate from,
-      @Parameter(description = "Дата конца периода фильтрации", example = "2025-02-01")
-          @RequestParam(required = false)
-          LocalDate to,
+      @Parameter(description = "Дата начала периода фильтрации (дата формирования)", example = "2025-01-01")
+          @RequestParam(required = false, name = "formedFrom")
+          LocalDate formedFrom,
+      @Parameter(description = "Дата конца периода фильтрации (дата формирования)", example = "2025-02-01")
+          @RequestParam(required = false, name = "formedTo")
+          LocalDate formedTo,
       @Parameter(description = "Статус расчета (например, DRAFT, SUBMITTED, COMPLETED)")
           @RequestParam(required = false)
           CalculateCpiStatus status,
       @AuthenticationPrincipal UserDetails userDetails) {
-    return calculateCpiService.findAllFiltered(from, to, status, userDetails.getUsername());
+    return calculateCpiService.findAllFiltered(formedFrom, formedTo, status, userDetails.getUsername());
   }
 
   @Operation(
@@ -155,5 +163,46 @@ public class CalculateCpiController {
       @Parameter(description = "ID черновика", example = "4") @PathVariable Long draftId,
       @AuthenticationPrincipal UserDetails userDetails) {
     calculateCpiService.delete(draftId, userDetails.getUsername());
+  }
+
+  @Operation(
+      summary = "Получить данные заявки для асинхронного сервиса",
+      description =
+          "Возвращает данные заявки для расчета ИПЦ асинхронным сервисом. Требует токен авторизации в заголовке X-Auth-Token.")
+  @ApiResponse(responseCode = "200", description = "Данные заявки успешно получены")
+  @ApiResponse(responseCode = "401", description = "Неверный токен авторизации")
+  @ApiResponse(responseCode = "404", description = "Заявка не найдена")
+  @GetMapping("/{id}/async-data")
+  public CalculateCpiDTO getAsyncData(
+      @Parameter(description = "ID заявки", example = "5") @PathVariable Long id,
+      @Parameter(description = "Токен авторизации", example = "lab8token")
+          @RequestHeader("X-Auth-Token")
+          String token) {
+    if (!"lab8token".equals(token)) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Invalid token");
+    }
+    return calculateCpiService.getByIdForAsyncService(id);
+  }
+
+  @Operation(
+      summary = "Обновить результаты асинхронной обработки",
+      description =
+          "Получает результаты асинхронной обработки заявки от Django сервиса. Требует токен авторизации в заголовке X-Auth-Token.")
+  @ApiResponse(responseCode = "200", description = "Результаты успешно обновлены")
+  @ApiResponse(responseCode = "401", description = "Неверный токен авторизации")
+  @ApiResponse(responseCode = "404", description = "Заявка не найдена")
+  @PutMapping("/{id}/async-result")
+  public void updateAsyncResult(
+      @Parameter(description = "ID заявки", example = "5") @PathVariable Long id,
+      @Parameter(description = "Токен авторизации", example = "lab8token")
+          @RequestHeader("X-Auth-Token")
+          String token,
+      @RequestBody AsyncResultDTO result) {
+    if (!"lab8token".equals(token)) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Invalid token");
+    }
+    calculateCpiService.updateAsyncResult(id, result);
   }
 }

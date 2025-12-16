@@ -1,12 +1,14 @@
 package com.bmstu.lab.infrastructure.security.handler;
 
 import com.bmstu.lab.infrastructure.security.jwt.JwtService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -35,14 +37,16 @@ public class RestAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
     String token = jwtService.generateToken(userDetails);
 
-    Cookie jwtCookie = new Cookie("jwt_token", token);
-    jwtCookie.setHttpOnly(true);
-    jwtCookie.setSecure(false);
-    jwtCookie.setPath("/");
-    jwtCookie.setMaxAge(24 * 60 * 60);
+    ResponseCookie cookie =
+        ResponseCookie.from("jwt_token", token)
+            .httpOnly(false)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofHours(2))
+            .sameSite("None")
+            .build();
 
-    response.addCookie(jwtCookie);
-
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     response.getWriter().write("{\"message\": \"Login successful\"}");
   }
 }

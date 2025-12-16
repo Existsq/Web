@@ -71,6 +71,9 @@ public class CalculateCpi {
   @Column(name = "personal_cpi")
   private Double personalCPI;
 
+  @Column(name = "calculation_success")
+  private Boolean calculationSuccess;
+
   @Column private int positions = 0;
 
   @OneToMany(

@@ -8,6 +8,7 @@ import com.bmstu.lab.infrastructure.persistence.entity.Category;
 import com.bmstu.lab.infrastructure.persistence.entity.User;
 import com.bmstu.lab.infrastructure.persistence.enums.CalculateCpiStatus;
 import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiCategoryRepository;
+import com.bmstu.lab.infrastructure.persistence.repository.CalculateCpiRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 public class CalculateCpiCategoryService {
 
   private final CalculateCpiCategoryRepository calculateCpiCategoryRepository;
+  private final CalculateCpiRepository calculateCpiRepository;
+
 
   public List<CalculateCpiCategory> findByCalculateCpi(CalculateCpi cpi) {
     return calculateCpiCategoryRepository.findByCalculateCpi(cpi);
@@ -39,6 +42,15 @@ public class CalculateCpiCategoryService {
     }
 
     calculateCpiCategoryRepository.deleteByCalculateCpiAndCategory(cpi, category);
+
+    // Если это черновик и это была последняя категория, удаляем черновик
+    if (cpi.getStatus() == CalculateCpiStatus.DRAFT) {
+      long remainingCategories = calculateCpiCategoryRepository.countByCalculateCpi(cpi);
+      if (remainingCategories == 0) {
+        calculateCpiRepository.delete(cpi);
+        // или calculateCpiService.delete(cpi.getId());
+      }
+    }
   }
 
   @Transactional

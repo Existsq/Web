@@ -21,7 +21,7 @@ public class CalculateCpiCategoryMapper {
     entity.setCalculateCpi(cpi);
     entity.setCategory(category);
     entity.setUserSpent(dto.getUserSpent());
-    entity.setCoefficient(dto.getCoefficient() != null ? dto.getCoefficient() : 0.0);
+    entity.setCoefficient(dto.getCoefficient());
     return entity;
   }
 }
