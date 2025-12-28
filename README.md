@@ -2,10 +2,10 @@
 ## Тема работы: Расчет ИПЦ
 
 ### Ссылки:
-**GitHubPages:** https://liza05444.github.io/De_Broglie_Calculation_RIP_2025_frontend
+**GitHubPages:** https://existsq.github.io/web-frontend/
 
-**Бэкенд (основной веб-сервис):** https://github.com/Liza05444/De_Broglie_Calculation_RIP_2025
+**Бэкенд (основной веб-сервис):** https://github.com/Existsq/Web
 
-**Бэкенд (асинхронный сервис):** https://github.com/Liza05444/De_Broglie_Calculation_RIP_2025_async_web_service
+**Бэкенд (асинхронный сервис):** https://github.com/Existsq/web-async-service
 
-**Фронтенд:** https://github.com/Liza05444/De_Broglie_Calculation_RIP_2025_frontend
+**Фронтенд:** https://github.com/Existsq/web-frontend/
